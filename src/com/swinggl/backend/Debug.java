@@ -1,9 +1,13 @@
 package com.swinggl.backend;
 
+import java.util.ArrayList;
+
 /**
  * Created on 12/13/2015.
  */
 public class Debug {
+
+    public static ArrayList<String> debuggedVariables = new ArrayList<String>();
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -21,5 +25,11 @@ public class Debug {
 
     public static void print(String text, String color) {
         System.out.println(color + "[SwingGL]" + text + ANSI_RESET);
+    }
+
+    public static void renderDebugVariables() {
+        for(int i = 0; i < debuggedVariables.size(); i++) {
+
+        }
     }
 }
