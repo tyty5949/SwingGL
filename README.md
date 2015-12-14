@@ -19,10 +19,9 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Scrollable Lists
   
 #### Backend Features
-  - 
+  - Variable Multi-Threaded Game Loop
 
 #### Planned Backend Features
-  - Variable Multi-Threaded Game Loop
   - Dubugging/Console Interface
   - Rendering Batches
   - Entities
