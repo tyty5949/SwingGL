@@ -42,10 +42,11 @@ public class GLFrame {
     private double fns;
     private double uns;
 
-    private GLPanel panel;
+    private volatile GLPanel panel;
 
     public GLFrame() {
-        //Thread.currentThread().setName(title + " | render");
+        System.setProperty("java.awt.headless", "true");
+        Thread.currentThread().setName(title + " | render");
         debugging = false;
 
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -61,30 +62,18 @@ public class GLFrame {
         visible = true;
         setTargetFPS(60);
         setTargetUPS(60);
-        panel = new GLPanel(Color.RED) {
-            @Override
-            public void initialize(GLFrame frame) {
-                initialized = true;
-            }
 
-            @Override
-            public void update(GLFrame frame, double delta) {
-            }
-
-            @Override
-            public void render(GLFrame frame, double delta) {
-            }
-        };
+        setPanel(null);
 
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-        windowHandle = glfwCreateWindow((int) w, (int) h, title, NULL, NULL);
+        windowHandle = glfwCreateWindow((int) w, (int) h, "Hello World!", NULL, NULL);
         if (windowHandle == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
     }
 
-    public void initialize() {
+    public void run() {
         new Thread(new UpdateThread(), title + " | update").start();
 
         setResizable(resizable);
@@ -93,7 +82,7 @@ public class GLFrame {
         glfwMakeContextCurrent(windowHandle);
         glfwSwapInterval(1);
 
-        setVisible(visible);
+        glfwShowWindow(windowHandle);
 
         GL.createCapabilities();
         GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -144,6 +133,7 @@ public class GLFrame {
 
     private void render(double delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwSwapBuffers(windowHandle);
         glfwPollEvents();
 
         if (panel != null) {
@@ -166,26 +156,6 @@ public class GLFrame {
 
     public void enableDebugging(boolean debugging) {
         this.debugging = debugging;
-    }
-
-    public GLFWCursorPosCallback getCursorPosCallback() {
-        return cursorPosCallback;
-    }
-
-    public GLFWErrorCallback getErrorCallback() {
-        return errorCallback;
-    }
-
-    public GLFWKeyCallback getKeyCallback() {
-        return keyCallback;
-    }
-
-    public GLFWMouseButtonCallback getMouseButtonCallback() {
-        return mouseButtonCallback;
-    }
-
-    public GLFWScrollCallback getScrollCallback() {
-        return scrollCallback;
     }
 
     private GLFrame getSuperClass() {

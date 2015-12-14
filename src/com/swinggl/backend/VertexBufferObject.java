@@ -25,5 +25,5 @@ public class VertexBufferObject {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
     }
 
-    public static void renderBufferData(int id, )
+    //public static void renderBufferData(int id, )
 }

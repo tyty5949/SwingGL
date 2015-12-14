@@ -1,4 +1,4 @@
-package test;
+package test.elements;
 
 import com.swinggl.elements.GLFrame;
 
@@ -16,6 +16,6 @@ public class FrameTest {
         glFrame.bindKeyboard();
         glFrame.bindMouse();
         glFrame.enableDebugging(true);
-        glFrame.initialize();
+        glFrame.run();
     }
 }

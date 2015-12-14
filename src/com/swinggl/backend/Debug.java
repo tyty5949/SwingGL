@@ -23,8 +23,16 @@ public class Debug {
         System.out.println(color + "[SwingGL] " + text + ANSI_RESET);
     }
 
+    public static void println(String text) {
+        System.out.println(ANSI_BLUE + "[SwingGL] " + text + ANSI_RESET);
+    }
+
     public static void print(String text, String color) {
         System.out.println(color + "[SwingGL]" + text + ANSI_RESET);
+    }
+
+    public static void print(String text) {
+        System.out.println(ANSI_BLUE + "[SwingGL]" + text + ANSI_RESET);
     }
 
     public static void renderDebugVariables() {
