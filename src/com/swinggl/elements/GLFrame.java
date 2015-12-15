@@ -41,7 +41,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * http://www.glfw.org/docs/latest/index.html
  * ------------------------------------------
  * GLFW
- * [?] Callbacks
+ * [X] Callbacks
  * [ ] Contexts
  * [ ] Monitors
  * [X] Windows
@@ -58,12 +58,22 @@ public class GLFrame {
     public static final int WINDOW_BOTTOM_LEFT = 3;
     public static final int WINDOW_BOTTOM_RIGHT = 4;
     private static final int WINDOW_POSITION_CUSTOM = -1;
-    // The window handle
+
+    // Callbacks
     private GLFWErrorCallback errorCallback;
     private GLFWKeyCallback keyCallback;
     private GLFWCursorPosCallback cursorPosCallback;
+    private GLFWCursorEnterCallback cursorEnterCallback = null;
     private GLFWMouseButtonCallback mouseButtonCallback;
     private GLFWScrollCallback scrollCallback;
+    private GLFWWindowPosCallback windowPosCallback = null;
+    private GLFWWindowSizeCallback windowSizeCallback = null;
+    private GLFWWindowCloseCallback windowCloseCallback = null;
+    private GLFWWindowRefreshCallback windowRefreshCallback = null;
+    private GLFWWindowFocusCallback windowFocusCallback = null;
+    private GLFWWindowIconifyCallback windowIconifyCallback = null;
+    private GLFWDropCallback dropCallback = null;
+
     private long window = 0L;
     private boolean running = false;
     private float updateDelta = 0.0f;
@@ -135,8 +145,16 @@ public class GLFrame {
 
         glfwSetKeyCallback(window, keyCallback);
         glfwSetCursorPosCallback(window, cursorPosCallback);
+        glfwSetCursorEnterCallback(window, cursorEnterCallback);
         glfwSetMouseButtonCallback(window, mouseButtonCallback);
         glfwSetScrollCallback(window, scrollCallback);
+        glfwSetWindowPosCallback(window, windowPosCallback);
+        glfwSetWindowSizeCallback(window, windowSizeCallback);
+        glfwSetWindowCloseCallback(window, windowCloseCallback);
+        glfwSetWindowRefreshCallback(window, windowRefreshCallback);
+        glfwSetWindowFocusCallback(window, windowFocusCallback);
+        glfwSetWindowIconifyCallback(window, windowIconifyCallback);
+        glfwSetDropCallback(window, dropCallback);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
@@ -253,39 +271,12 @@ public class GLFrame {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-        if (window != 0L) {
-            if (visible)
-                glfwShowWindow(window);
-            else
-                glfwHideWindow(window);
-        } else {
-            if (visible)
-                glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-            else
-                glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        }
-    }
-
     public Color getBackgroundColor() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(Color color) {
-        backgroundColor = color;
-        if (window != 0L)
-            GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
-    }
-
     public Point getPosition() {
         return new Point(windowX, windowY);
-    }
-
-    public void setPosition(int position) {
-        this.windowPosition = position;
-        if (window != 0L && !fullscreen)
-            updateWindowPosition();
     }
 
     public Dimension getSize() {
@@ -296,10 +287,10 @@ public class GLFrame {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setBackgroundColor(Color color) {
+        backgroundColor = color;
         if (window != 0L)
-            glfwSetWindowTitle(window, title);
+            GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
     }
 
     public void setContextVersionMajor(int majorVersion) {
@@ -312,6 +303,12 @@ public class GLFrame {
         if (window != 0L)
             throw new RuntimeException("GLFW window already initialized, cannot set minorVersion");
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
+    }
+
+    public void setCursorEnterCallback(GLFWCursorEnterCallback cursorEnterCallback) {
+        this.cursorEnterCallback = cursorEnterCallback;
+        if (window != 0)
+            glfwSetCursorEnterCallback(window, cursorEnterCallback);
     }
 
     public void setCursorPosCallback(GLFWCursorPosCallback cursorPosCallback) {
@@ -327,6 +324,11 @@ public class GLFrame {
             glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
         else
             glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+    }
+
+    public void setDropCallback(GLFWDropCallback dropCallback) {
+        if (window != 0)
+            glfwSetDropCallback(window, dropCallback);
     }
 
     public void setKeyCallback(GLFWKeyCallback keyCallback) {
@@ -351,6 +353,12 @@ public class GLFrame {
         if (currentGameState != null)
             currentGameState.dispose();
         currentGameState = panel;
+    }
+
+    public void setPosition(int position) {
+        this.windowPosition = position;
+        if (window != 0L && !fullscreen)
+            updateWindowPosition();
     }
 
     public void setPosition(int windowX, int windowY) {
@@ -412,6 +420,63 @@ public class GLFrame {
     public void setTargetUPS(int targetUPS) {
         this.targetUPS = targetUPS;
         updateNS = 1000000000.0 / targetUPS;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+        if (window != 0L)
+            glfwSetWindowTitle(window, title);
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        if (window != 0L) {
+            if (visible)
+                glfwShowWindow(window);
+            else
+                glfwHideWindow(window);
+        } else {
+            if (visible)
+                glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+            else
+                glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        }
+    }
+
+    public void setWindowCloseCallback(GLFWWindowCloseCallback windowCloseCallback) {
+        this.windowCloseCallback = windowCloseCallback;
+        if (window != 0L)
+            glfwSetWindowCloseCallback(window, windowCloseCallback);
+    }
+
+    public void setWindowFocusCallback(GLFWWindowFocusCallback windowFocusCallback) {
+        this.windowFocusCallback = windowFocusCallback;
+        if (window != 0L)
+            glfwSetWindowFocusCallback(window, windowFocusCallback);
+    }
+
+    public void setWindowIconifyCallback(GLFWWindowIconifyCallback windowIconifyCallback) {
+        this.windowIconifyCallback = windowIconifyCallback;
+        if (window != 0L)
+            glfwSetWindowIconifyCallback(window, windowIconifyCallback);
+    }
+
+    public void setWindowPosCallback(GLFWWindowPosCallback windowPosCallback) {
+        this.windowPosCallback = windowPosCallback;
+        if (window != 0L)
+            glfwSetWindowPosCallback(window, windowPosCallback);
+    }
+
+    public void setWindowRefreshCallback(GLFWWindowRefreshCallback windowRefreshCallback) {
+        this.windowRefreshCallback = windowRefreshCallback;
+        if (window != 0L)
+            glfwSetWindowRefreshCallback(window, windowRefreshCallback);
+    }
+
+    public void setWindowSizeCallback(GLFWWindowSizeCallback windowSizeCallback) {
+        this.windowSizeCallback = windowSizeCallback;
+        if (window != 0L)
+            glfwSetWindowSizeCallback(window, windowSizeCallback);
     }
 
     private class Update implements Runnable {
