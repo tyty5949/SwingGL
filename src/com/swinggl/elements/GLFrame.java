@@ -42,11 +42,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * ------------------------------------------
  * GLFW
  * [X] Callbacks
- * [ ] Cursors
+ * [X] Cursors
+ * [ ] Cursor Object (Cursor look)
  * [ ] Contexts
  * [ ] Monitors
  * [X] Windows
- * [?] Input
+ * [X] Input
  * [ ] Joysticks
  * [ ] Oculus Rift
  * [ ] Standards
@@ -96,6 +97,8 @@ public class GLFrame {
     private double renderNS = 1000000000.0 / targetFPS;
     private double updateNS = 1000000000.0 / targetUPS;
     private boolean visible = true;
+    private boolean mouseDisabled = false;
+    private boolean mouseHidden = false;
 
     private GLPanel currentGameState;
 
@@ -157,6 +160,13 @@ public class GLFrame {
         glfwSetWindowFocusCallback(window, windowFocusCallback);
         glfwSetWindowIconifyCallback(window, windowIconifyCallback);
         glfwSetDropCallback(window, dropCallback);
+
+        if (mouseDisabled)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else if (mouseHidden)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        else
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
@@ -247,6 +257,30 @@ public class GLFrame {
         return this;
     }
 
+    public void disableMouse() {
+        mouseDisabled = true;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    public void hideMouse() {
+        mouseHidden = true;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void showMouse() {
+        mouseHidden = false;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void enableMouse() {
+        mouseDisabled = false;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
     public void exit() {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
@@ -264,9 +298,16 @@ public class GLFrame {
         return glfwGetWindowAttrib(window, GLFW_ICONIFIED);
     }
 
-    // Uses GLFW_TRUE and GLFW_FALSE
     public int isInFocus() {
         return glfwGetWindowAttrib(window, GLFW_FOCUSED);
+    }
+
+    public boolean isMouseDisabled() {
+        return mouseDisabled;
+    }
+
+    public boolean isMouseHidden() {
+        return mouseHidden;
     }
 
     public boolean isVisible() {
@@ -275,6 +316,14 @@ public class GLFrame {
 
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    public String getClipboardString() {
+        if (window != 0L)
+            return glfwGetClipboardString(window);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return "";
     }
 
     public Point getPosition() {
@@ -293,6 +342,13 @@ public class GLFrame {
         backgroundColor = color;
         if (window != 0L)
             GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+    }
+
+    public void setClipboardString(String clipboardString) {
+        if (window != 0L)
+            glfwSetClipboardString(window, clipboardString);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
     }
 
     public void setContextVersionMajor(int majorVersion) {
