@@ -44,14 +44,13 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * [X] Callbacks
  * [X] Cursors
  * [ ] Cursor Object (Cursor look)
- * [ ] Contexts
+ * [X] Contexts
  * [ ] Monitors
  * [X] Windows
  * [X] Input
  * [ ] Joysticks
- * [ ] Oculus Rift
+ * [N] Oculus Rift (Only for 3D)
  * [ ] Standards
- * [ ] Build in references (Joystick buttons, Mouse cursors, etc)
  */
 public class GLFrame {
 
@@ -78,6 +77,7 @@ public class GLFrame {
     private GLFWDropCallback dropCallback = null;
 
     private long window = 0L;
+    private long secondWindowHandle;
     private boolean running = false;
     private float updateDelta = 0.0f;
     private float renderDelta = 0.0f;
@@ -103,13 +103,22 @@ public class GLFrame {
     private GLPanel currentGameState;
 
     public GLFrame() {
-        this(false);
+        this(false, NULL);
+    }
+
+    public GLFrame(long secondWindowHandle) {
+        this(false, secondWindowHandle);
     }
 
     public GLFrame(boolean fullscreen) {
+        this(fullscreen, NULL);
+    }
+
+    public GLFrame(boolean fullscreen, long secondWindowHandle) {
         System.setProperty("java.awt.headless", "true");
         Thread.currentThread().setName("SwingGL | render");
         this.fullscreen = fullscreen;
+        this.secondWindowHandle = secondWindowHandle;
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
 
         if (glfwInit() != GL11.GL_TRUE)
@@ -130,7 +139,7 @@ public class GLFrame {
 
     public void run() {
         if (fullscreen) {
-            window = glfwCreateWindow(windowWidth, windowHeight, title, glfwGetPrimaryMonitor(), NULL);
+            window = glfwCreateWindow(windowWidth, windowHeight, title, glfwGetPrimaryMonitor(), secondWindowHandle);
             GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (!(windowWidth == vidmode.width() && windowHeight == vidmode.height())) {
                 Debug.println("GLFWVidMode [" + windowWidth + ", " + windowHeight + "] not available, switching to GLFWVidMode [" + vidmode.width() + ", "
@@ -139,7 +148,7 @@ public class GLFrame {
                 windowHeight = vidmode.height();
             }
         } else
-            window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
+            window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, secondWindowHandle);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
