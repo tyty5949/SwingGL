@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.Calendar;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -16,97 +15,135 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * Created on 12/13/2015.
+ * http://www.glfw.org/docs/latest/index.html
+ * ------------------------------------------
+ * GLFW
+ * [?] Callbacks
+ * [ ] Contexts
+ * [ ] Monitors
+ * [X] Windows
+ * [?] Input
+ * [ ] Oculus Rift
+ * [ ] Standards
+ * [ ] Build in references (Joystick buttons, Mouse cursors, etc)
  */
 public class GLFrame {
 
-    public static final int EXIT_ON_CLOSE = 0;
     public static final int WINDOW_CENTERED = 0;
     public static final int WINDOW_TOP_LEFT = 1;
     public static final int WINDOW_TOP_RIGHT = 2;
     public static final int WINDOW_BOTTOM_LEFT = 3;
     public static final int WINDOW_BOTTOM_RIGHT = 4;
+    private static final int WINDOW_POSITION_CUSTOM = -1;
+    // The window handle
+    private GLFWErrorCallback errorCallback;
+    private GLFWKeyCallback keyCallback;
+    private GLFWCursorPosCallback cursorPosCallback;
+    private GLFWMouseButtonCallback mouseButtonCallback;
+    private GLFWScrollCallback scrollCallback;
+    private long window = 0L;
+    private boolean running = false;
+    private float updateDelta = 0.0f;
+    private float renderDelta = 0.0f;
+    private boolean debug;
 
-    private static GLFWErrorCallback errorCallback;
-    private static GLFWKeyCallback keyCallback;
-    private static GLFWCursorPosCallback cursorPosCallback;
-    private static GLFWMouseButtonCallback mouseButtonCallback;
-    private static GLFWScrollCallback scrollCallback;
-    private boolean debugging;
-    private long windowHandle;
-    private String title;
-    private float x, y, w, h;
-    private boolean resizable;
-    private boolean visible;
-    private int targetFPS;
-    private int targetUPS;
-    private double fns;
-    private double uns;
+    // Window Attributes
+    private String title = "SwingGL - GLFrame";
+    private Color backgroundColor = Color.WHITE;
+    private int windowWidth = 600;
+    private int windowHeight = 400;
+    private int windowX = 0;
+    private int windowY = 0;
+    private int windowPosition = WINDOW_CENTERED;
+    private boolean fullscreen;
+    private double targetFPS = 60.0;
+    private double targetUPS = 60.0;
+    private double renderNS = 1000000000.0 / targetFPS;
+    private double updateNS = 1000000000.0 / targetUPS;
+    private boolean visible = true;
 
-    private volatile GLPanel panel;
+    private GLPanel currentGameState;
 
     public GLFrame() {
-        System.setProperty("java.awt.headless", "true");
-        Thread.currentThread().setName(title + " | render");
-        debugging = false;
+        this(false);
+    }
 
+    public GLFrame(boolean fullscreen) {
+        System.setProperty("java.awt.headless", "true");
+        Thread.currentThread().setName("SwingGL | render");
+        this.fullscreen = fullscreen;
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        if (glfwInit() != GLFW_TRUE)
+
+        if (glfwInit() != GL11.GL_TRUE)
             throw new IllegalStateException("Unable to initialize GLFW");
 
-        title = "Sample Title";
-        x = 0.0f;
-        y = 0.0f;
-        w = 720.0f;
-        h = 480.0f;
-        resizable = true;
-        visible = true;
-        setTargetFPS(60);
-        setTargetUPS(60);
-
-        setPanel(null);
-
+        // Configure our window
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+        glfwWindowHint(GLFW_DECORATED, GL_TRUE);
 
-        windowHandle = glfwCreateWindow((int) w, (int) h, "Hello World!", NULL, NULL);
-        if (windowHandle == NULL)
-            throw new RuntimeException("Failed to create the GLFW window");
+        // Configure callbacks
+        keyCallback = new Keyboard();
+        cursorPosCallback = new Mouse.CursorPos();
+        mouseButtonCallback = new Mouse.MouseButton();
+        scrollCallback = new Mouse.Scroll();
     }
 
     public void run() {
-        new Thread(new UpdateThread(), title + " | update").start();
+        if (fullscreen) {
+            window = glfwCreateWindow(windowWidth, windowHeight, title, glfwGetPrimaryMonitor(), NULL);
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            if (!(windowWidth == vidmode.width() && windowHeight == vidmode.height())) {
+                Debug.println("GLFWVidMode [" + windowWidth + ", " + windowHeight + "] not available, switching to GLFWVidMode [" + vidmode.width() + ", "
+                        + vidmode.height() + "]", Debug.ANSI_YELLOW);
+                windowWidth = vidmode.width();
+                windowHeight = vidmode.height();
+            }
+        } else
+            window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
+        if (window == NULL)
+            throw new RuntimeException("Failed to create the GLFW window");
 
-        setResizable(resizable);
-        setWindowLocation(WINDOW_CENTERED);
+        if (windowPosition == WINDOW_POSITION_CUSTOM && !fullscreen)
+            glfwSetWindowPos(window, windowX, windowY);
+        else if (!fullscreen)
+            updateWindowPosition();
 
-        glfwMakeContextCurrent(windowHandle);
+        glfwSetKeyCallback(window, keyCallback);
+        glfwSetCursorPosCallback(window, cursorPosCallback);
+        glfwSetMouseButtonCallback(window, mouseButtonCallback);
+        glfwSetScrollCallback(window, scrollCallback);
+
+        glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
-
-        glfwShowWindow(windowHandle);
 
         GL.createCapabilities();
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        GL11.glOrtho(0, w, h, 0, 1, -1);
+        GL11.glOrtho(0, windowWidth, windowHeight, 0, 1, -1);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
+                backgroundColor.getAlpha() / 255f);
 
+        if (visible)
+            glfwShowWindow(window);
+
+        new Thread(new Update(), "SwingGL | update").start();
         long now = System.nanoTime();
         long lastTime = now;
         double deltaR = 0.0;
         long lastRender = now;
-        double renderDelta;
-        boolean running = true;
 
-        if (debugging)
-            Debug.println("Began game loop @ " + Calendar.getInstance().getTime(), Debug.ANSI_BLUE);
+        running = true;
 
         while (running) {
-            if (glfwWindowShouldClose(windowHandle) == GL_TRUE)
+            if (glfwWindowShouldClose(window) == GL_TRUE)
                 running = false;
 
             now = System.nanoTime();
-            deltaR += (now - lastTime) / fns;
+            deltaR += (now - lastTime) / renderNS;
             lastTime = now;
 
             if (deltaR >= 1.0) {
@@ -117,148 +154,272 @@ public class GLFrame {
             }
         }
 
+        if (currentGameState != null)
+            currentGameState.dispose();
+
         try {
-            glfwDestroyWindow(windowHandle);
+            glfwDestroyWindow(window);
             keyCallback.release();
+            cursorPosCallback.release();
             mouseButtonCallback.release();
             scrollCallback.release();
-            cursorPosCallback.release();
         } finally {
             glfwTerminate();
             errorCallback.release();
         }
-        if (debugging)
-            Debug.println("Closed game loop @ " + Calendar.getInstance().getTime(), Debug.ANSI_BLUE);
     }
 
-    private void render(double delta) {
+    private void render(float delta) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glfwSwapBuffers(windowHandle);
-        glfwPollEvents();
 
-        if (panel != null) {
-            if (!panel.initialized)
-                panel.initialize(this);
+        if (currentGameState != null) {
+            if (currentGameState.initialized)
+                currentGameState.render(this, delta);
             else
-                panel.render(this, delta);
+                currentGameState.init(this);
         }
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
-    public void bindKeyboard() {
-        glfwSetKeyCallback(windowHandle, keyCallback = new Keyboard());
+    private void updateWindowPosition() {
+        if (!(windowPosition == WINDOW_CENTERED || windowPosition == WINDOW_TOP_LEFT || windowPosition == WINDOW_TOP_RIGHT || windowPosition ==
+                WINDOW_BOTTOM_LEFT || windowPosition == WINDOW_BOTTOM_RIGHT))
+            throw new RuntimeException("Window position: " + windowPosition + " is not a valid SwingGL window position");
+        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if (windowPosition == WINDOW_CENTERED)
+            glfwSetWindowPos(window, windowX = ((vidmode.width() / 2) - (windowWidth / 2)), windowY = ((vidmode.height() / 2) - (windowHeight / 2)));
+        else if (windowPosition == WINDOW_TOP_LEFT)
+            glfwSetWindowPos(window, windowX = 0, windowY = 0);
+        else if (windowPosition == WINDOW_TOP_RIGHT)
+            glfwSetWindowPos(window, windowX = (vidmode.width() - windowWidth), windowY = 0);
+        else if (windowPosition == WINDOW_BOTTOM_LEFT)
+            glfwSetWindowPos(window, windowX = 0, windowY = (vidmode.height() - windowHeight));
+        else if (windowPosition == WINDOW_BOTTOM_RIGHT)
+            glfwSetWindowPos(window, windowX = (vidmode.width() - windowWidth), windowY = (vidmode.height() - windowHeight));
     }
 
-    public void bindMouse() {
-        glfwSetCursorPosCallback(windowHandle, cursorPosCallback = new Mouse.CursorPos());
-        glfwSetMouseButtonCallback(windowHandle, mouseButtonCallback = new Mouse.MouseButton());
-        glfwSetScrollCallback(windowHandle, scrollCallback = new Mouse.Scroll());
-    }
-
-    public void enableDebugging(boolean debugging) {
-        this.debugging = debugging;
-    }
-
-    private GLFrame getSuperClass() {
+    private GLFrame getGLFrame() {
         return this;
     }
 
-    public long getWindowHandle() {
-        return windowHandle;
+    public void exit() {
+        glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    public void setPanel(GLPanel panel) {
-        this.panel = panel;
+    public void iconify() {
+        if (window != 0L)
+            glfwIconifyWindow(window);
     }
 
-    public void setResizable(boolean resizable) {
-        this.resizable = resizable;
-        if (resizable)
-            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    public boolean isFullscreen() {
+        return fullscreen;
     }
 
-    public void setSize(float w, float h) {
-        this.w = w;
-        this.h = h;
-        glfwSetWindowSize(windowHandle, (int) w, (int) h);
+    public int isIconified() {
+        return glfwGetWindowAttrib(window, GLFW_ICONIFIED);
     }
 
-    public void setTargetFPS(int targetFPS) {
-        this.targetFPS = targetFPS;
-        fns = 1000000000.0f / targetFPS;
+    // Uses GLFW_TRUE and GLFW_FALSE
+    public int isInFocus() {
+        return glfwGetWindowAttrib(window, GLFW_FOCUSED);
     }
 
-    public void setTargetUPS(int targetUPS) {
-        this.targetUPS = targetUPS;
-        uns = 1000000000.0f / targetUPS;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-        glfwSetWindowTitle(windowHandle, title);
+    public boolean isVisible() {
+        return visible;
     }
 
     public void setVisible(boolean visible) {
         this.visible = visible;
-        if (visible)
-            glfwShowWindow(windowHandle);
-        else
-            glfwHideWindow(windowHandle);
-    }
-
-    public void setWindowLocation(int loc) {
-        if (loc == WINDOW_CENTERED) {
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            setWindowLocation((vidmode.width() - (int) w) / 2, (vidmode.height() - (int) h) / 2);
-        } else if (loc == WINDOW_TOP_LEFT) {
-            setWindowLocation(0, 0);
-        } else if (loc == WINDOW_TOP_RIGHT) {
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            setWindowLocation((vidmode.width() - (int) w), 0);
-        } else if (loc == WINDOW_BOTTOM_LEFT) {
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            setWindowLocation(0, (vidmode.height() - (int) h));
-        } else if (loc == WINDOW_BOTTOM_RIGHT) {
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            setWindowLocation((vidmode.width() - (int) w), (vidmode.height() - (int) h));
+        if (window != 0L) {
+            if (visible)
+                glfwShowWindow(window);
+            else
+                glfwHideWindow(window);
+        } else {
+            if (visible)
+                glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+            else
+                glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         }
     }
 
-    public void setWindowLocation(float x, float y) {
-        this.x = x;
-        this.y = y;
-        glfwSetWindowPos(windowHandle, (int) x, (int) y);
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 
-    private class UpdateThread implements Runnable {
+    public void setBackgroundColor(Color color) {
+        backgroundColor = color;
+        if (window != 0L)
+            GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+    }
+
+    public Point getPosition() {
+        return new Point(windowX, windowY);
+    }
+
+    public void setPosition(int position) {
+        this.windowPosition = position;
+        if (window != 0L && !fullscreen)
+            updateWindowPosition();
+    }
+
+    public Dimension getSize() {
+        return new Dimension(windowWidth, windowHeight);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+        if (window != 0L)
+            glfwSetWindowTitle(window, title);
+    }
+
+    public void setContextVersionMajor(int majorVersion) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot set majorVersion");
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
+    }
+
+    public void setContextVersionMinor(int minorVersion) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot set minorVersion");
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
+    }
+
+    public void setCursorPosCallback(GLFWCursorPosCallback cursorPosCallback) {
+        this.cursorPosCallback = cursorPosCallback;
+        if (window != 0L)
+            glfwSetCursorPosCallback(window, cursorPosCallback);
+    }
+
+    public void setDecorated(boolean decorated) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot set decorated");
+        if (decorated)
+            glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
+        else
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+    }
+
+    public void setKeyCallback(GLFWKeyCallback keyCallback) {
+        this.keyCallback = keyCallback;
+        if (window != 0L)
+            glfwSetKeyCallback(window, keyCallback);
+    }
+
+    public void setMouseButtonCallback(GLFWMouseButtonCallback mouseButtonCallback) {
+        this.mouseButtonCallback = mouseButtonCallback;
+        if (window != 0L)
+            glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    }
+
+    public void setMultisampling(int samples) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot send new samples");
+        glfwWindowHint(GLFW_SAMPLES, samples);
+    }
+
+    public void setPanel(GLPanel panel) {
+        if (currentGameState != null)
+            currentGameState.dispose();
+        currentGameState = panel;
+    }
+
+    public void setPosition(int windowX, int windowY) {
+        this.windowX = windowX;
+        this.windowY = windowY;
+        windowPosition = WINDOW_POSITION_CUSTOM;
+        if (window != 0L)
+            glfwSetWindowPos(window, windowX, windowY);
+    }
+
+    public void setRefreshRate(int refreshRate) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot send new refreshRate");
+        glfwWindowHint(GLFW_REFRESH_RATE, refreshRate);
+    }
+
+    public void setResizable(boolean resizable) {
+        if (window != 0L)
+            throw new RuntimeException("GLFW window already initialized, cannot send new resizable");
+        if (resizable)
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        else
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    }
+
+    public void setScrollCallback(GLFWScrollCallback scrollCallback) {
+        this.scrollCallback = scrollCallback;
+        if (window != 0L)
+            glfwSetScrollCallback(window, scrollCallback);
+    }
+
+    public void setSize(int width, int height) {
+        windowWidth = width;
+        windowHeight = height;
+        if (fullscreen) {
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            if (!(windowWidth == vidmode.width() && windowHeight == vidmode.height())) {
+                Debug.println("GLFWVidMode [" + windowWidth + ", " + windowHeight + "] not available, switching to GLFWVidMode [" + vidmode.width() + ", "
+                        + vidmode.height() + "]", Debug.ANSI_YELLOW);
+                windowWidth = vidmode.width();
+                windowHeight = vidmode.height();
+            }
+        }
+
+        if (window != 0L) {
+            glfwSetWindowSize(window, windowWidth, windowHeight);
+            GL11.glMatrixMode(GL11.GL_PROJECTION);
+            GL11.glLoadIdentity();
+            GL11.glOrtho(0, windowWidth, windowHeight, 0, 1, -1);
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        }
+    }
+
+    public void setTargetFPS(int targetFPS) {
+        this.targetFPS = targetFPS;
+        renderNS = 1000000000.0 / targetFPS;
+    }
+
+    public void setTargetUPS(int targetUPS) {
+        this.targetUPS = targetUPS;
+        updateNS = 1000000000.0 / targetUPS;
+    }
+
+    private class Update implements Runnable {
 
         @Override
         public void run() {
             long now = System.nanoTime();
             long lastTime = now;
-            double deltaU = 0.0;
+            double deltaT = 0.0;
             long lastUpdate = now;
-            boolean running = true;
 
             while (running) {
-                if (glfwWindowShouldClose(windowHandle) == GL_TRUE)
-                    running = false;
-
                 now = System.nanoTime();
-                deltaU += (now - lastTime) / uns;
+                deltaT += (now - lastTime) / updateNS;
                 lastTime = now;
 
-                if (deltaU >= 1.0) {
-                    update((now - lastUpdate) / 1000000000.0f);
+                if (deltaT >= 1.0) {
+                    update(updateDelta);
+                    updateDelta = (now - lastUpdate) / 1000000000.0f;
                     lastUpdate = now;
-                    deltaU--;
+                    deltaT = 0.0;
                 }
             }
         }
 
-        private void update(double delta) {
-            if (panel != null) {
-                if (panel.initialized)
-                    panel.update(getSuperClass(), delta);
+        private void update(float delta) {
+            if (window != 0L) {
+                if (currentGameState != null) {
+                    if (currentGameState.initialized)
+                        currentGameState.update(getGLFrame(), delta);
+                }
             }
         }
     }
