@@ -31,6 +31,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -48,9 +50,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * [ ] Monitors
  * [X] Windows
  * [X] Input
- * [ ] Joysticks
+ * [X] Joysticks
  * [N] Oculus Rift (Only for 3D)
- * [ ] Standards
  */
 public class GLFrame {
 
@@ -311,6 +312,14 @@ public class GLFrame {
         return glfwGetWindowAttrib(window, GLFW_FOCUSED);
     }
 
+    public int isJoystickPresent(int joystick) {
+        if (window != 0L)
+            return glfwJoystickPresent(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return 0;
+    }
+
     public boolean isMouseDisabled() {
         return mouseDisabled;
     }
@@ -330,6 +339,30 @@ public class GLFrame {
     public String getClipboardString() {
         if (window != 0L)
             return glfwGetClipboardString(window);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return "";
+    }
+
+    public FloatBuffer getJoystickAxes(int joystick) {
+        if (window != 0L)
+            glfwGetJoystickAxes(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return null;
+    }
+
+    public ByteBuffer getJoystickButtons(int joystick) {
+        if (window != 0L)
+            return glfwGetJoystickButtons(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return null;
+    }
+
+    public String getJoystickName(int joystick) {
+        if (window != 0L)
+            return glfwGetJoystickName(joystick);
         else
             Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
         return "";
