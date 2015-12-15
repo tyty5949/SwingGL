@@ -42,10 +42,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * ------------------------------------------
  * GLFW
  * [X] Callbacks
+ * [ ] Cursors
  * [ ] Contexts
  * [ ] Monitors
  * [X] Windows
  * [?] Input
+ * [ ] Joysticks
  * [ ] Oculus Rift
  * [ ] Standards
  * [ ] Build in references (Joystick buttons, Mouse cursors, etc)
@@ -335,6 +337,10 @@ public class GLFrame {
         this.keyCallback = keyCallback;
         if (window != 0L)
             glfwSetKeyCallback(window, keyCallback);
+    }
+
+    public void setMonitorCallback(GLFWMonitorCallback monitorCallback) {
+        glfwSetMonitorCallback(monitorCallback);
     }
 
     public void setMouseButtonCallback(GLFWMouseButtonCallback mouseButtonCallback) {
