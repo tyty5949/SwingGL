@@ -25,16 +25,40 @@ package com.swinggl.elements;
 
 /**
  * Created on 12/13/2015.
+ * This class functions as a "gamestate" that allows any class to extend it and have methods ready for gameloop integration
  */
 public abstract class GLPanel {
 
+    /**
+     * Whether or not the panel is initialized (must be set to true after initializations in init() are done)
+     **/
     public boolean initialized = false;
 
+    /**
+     * Called when the GLPanel is first detected by the loop from the render thread which contains the OpenGL context (all initializations go here)
+     *
+     * @param frame - The frame which the GLPanel is on
+     */
     public abstract void init(GLFrame frame);
 
+    /**
+     * Called from the update frame so updates are separate from renders
+     *
+     * @param frame - The frame which the GLPanel is on
+     * @param delta - The time since the last update call
+     */
     public abstract void update(GLFrame frame, float delta);
 
+    /**
+     * Called from the render thread which contains the OpenGL context
+     *
+     * @param frame - The frame which the GLPanel is on
+     * @param delta - The time since the last render call
+     */
     public abstract void render(GLFrame frame, float delta);
 
+    /**
+     * Called from the render thread when the GLFrame is closing
+     */
     public abstract void dispose();
 }
