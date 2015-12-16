@@ -23,9 +23,13 @@ package test.elements;
 
  */
 
+import com.swinggl.backend.Debug;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import com.swinggl.util.IOUtil;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 /**
  * Created on 12/13/2015.
@@ -42,6 +46,17 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void init(GLFrame frame) {
+        for(int i = 0; i < 10; i++) {
+            long startTime = System.nanoTime();
+            try{
+                IOUtil.createBufferFromFile("res/test/backend/file.jpg",(16*1024));
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
+            long endTime = System.nanoTime();
+            Debug.println("" + ((endTime - startTime) / 1000000000.0));
+        }
+
         initialized = true;
     }
 
