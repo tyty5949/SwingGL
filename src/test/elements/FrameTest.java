@@ -24,6 +24,7 @@ package test.elements;
  */
 
 import com.swinggl.backend.Debug;
+import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
 import com.swinggl.util.IOUtil;
@@ -41,9 +42,11 @@ public class FrameTest extends GLPanel {
         glFrame.setSize(1280, 720);
         glFrame.setTitle("This is a test title");
         glFrame.setPanel(new FrameTest());
+        glFrame.setResizable(true);
         glFrame.run();
     }
 
+    private Texture tex;
     @Override
     public void init(GLFrame frame) {
         for(int i = 0; i < 10; i++) {
@@ -53,6 +56,7 @@ public class FrameTest extends GLPanel {
             }catch (IOException e){
                 throw new RuntimeException(e);
             }
+            tex = new Texture("res/test/backend/file.jpg");
             long endTime = System.nanoTime();
             Debug.println("" + ((endTime - startTime) / 1000000000.0));
         }
@@ -68,10 +72,15 @@ public class FrameTest extends GLPanel {
     @Override
     public void render(GLFrame frame, float delta) {
         GL11.glColor3f(0f, 1f, 1f);
+        tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0f,0f);
         GL11.glVertex2f(0f, 0f);
+        GL11.glTexCoord2f(100f,0f);
         GL11.glVertex2f(100f, 0f);
+        GL11.glTexCoord2f(100f,100f);
         GL11.glVertex2f(100f, 100f);
+        GL11.glTexCoord2f(0f,100f);
         GL11.glVertex2f(0f, 100f);
         GL11.glEnd();
     }
