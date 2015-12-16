@@ -31,6 +31,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -42,13 +44,14 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * ------------------------------------------
  * GLFW
  * [X] Callbacks
- * [ ] Contexts
+ * [X] Cursors
+ * [ ] Cursor Object (Cursor look)
+ * [X] Contexts
  * [ ] Monitors
  * [X] Windows
- * [?] Input
- * [ ] Oculus Rift
- * [ ] Standards
- * [ ] Build in references (Joystick buttons, Mouse cursors, etc)
+ * [X] Input
+ * [X] Joysticks
+ * [N] Oculus Rift (Only for 3D)
  */
 public class GLFrame {
 
@@ -75,6 +78,7 @@ public class GLFrame {
     private GLFWDropCallback dropCallback = null;
 
     private long window = 0L;
+    private long secondWindowHandle;
     private boolean running = false;
     private float updateDelta = 0.0f;
     private float renderDelta = 0.0f;
@@ -94,17 +98,28 @@ public class GLFrame {
     private double renderNS = 1000000000.0 / targetFPS;
     private double updateNS = 1000000000.0 / targetUPS;
     private boolean visible = true;
+    private boolean mouseDisabled = false;
+    private boolean mouseHidden = false;
 
     private GLPanel currentGameState;
 
     public GLFrame() {
-        this(false);
+        this(false, NULL);
+    }
+
+    public GLFrame(long secondWindowHandle) {
+        this(false, secondWindowHandle);
     }
 
     public GLFrame(boolean fullscreen) {
+        this(fullscreen, NULL);
+    }
+
+    public GLFrame(boolean fullscreen, long secondWindowHandle) {
         System.setProperty("java.awt.headless", "true");
         Thread.currentThread().setName("SwingGL | render");
         this.fullscreen = fullscreen;
+        this.secondWindowHandle = secondWindowHandle;
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
 
         if (glfwInit() != GL11.GL_TRUE)
@@ -125,7 +140,7 @@ public class GLFrame {
 
     public void run() {
         if (fullscreen) {
-            window = glfwCreateWindow(windowWidth, windowHeight, title, glfwGetPrimaryMonitor(), NULL);
+            window = glfwCreateWindow(windowWidth, windowHeight, title, glfwGetPrimaryMonitor(), secondWindowHandle);
             GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
             if (!(windowWidth == vidmode.width() && windowHeight == vidmode.height())) {
                 Debug.println("GLFWVidMode [" + windowWidth + ", " + windowHeight + "] not available, switching to GLFWVidMode [" + vidmode.width() + ", "
@@ -134,7 +149,7 @@ public class GLFrame {
                 windowHeight = vidmode.height();
             }
         } else
-            window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
+            window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, secondWindowHandle);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -155,6 +170,13 @@ public class GLFrame {
         glfwSetWindowFocusCallback(window, windowFocusCallback);
         glfwSetWindowIconifyCallback(window, windowIconifyCallback);
         glfwSetDropCallback(window, dropCallback);
+
+        if (mouseDisabled)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else if (mouseHidden)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        else
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
@@ -245,6 +267,30 @@ public class GLFrame {
         return this;
     }
 
+    public void disableMouse() {
+        mouseDisabled = true;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    public void hideMouse() {
+        mouseHidden = true;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void showMouse() {
+        mouseHidden = false;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    public void enableMouse() {
+        mouseDisabled = false;
+        if (window != 0L)
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
     public void exit() {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
@@ -262,9 +308,24 @@ public class GLFrame {
         return glfwGetWindowAttrib(window, GLFW_ICONIFIED);
     }
 
-    // Uses GLFW_TRUE and GLFW_FALSE
     public int isInFocus() {
         return glfwGetWindowAttrib(window, GLFW_FOCUSED);
+    }
+
+    public int isJoystickPresent(int joystick) {
+        if (window != 0L)
+            return glfwJoystickPresent(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return 0;
+    }
+
+    public boolean isMouseDisabled() {
+        return mouseDisabled;
+    }
+
+    public boolean isMouseHidden() {
+        return mouseHidden;
     }
 
     public boolean isVisible() {
@@ -273,6 +334,38 @@ public class GLFrame {
 
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    public String getClipboardString() {
+        if (window != 0L)
+            return glfwGetClipboardString(window);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return "";
+    }
+
+    public FloatBuffer getJoystickAxes(int joystick) {
+        if (window != 0L)
+            glfwGetJoystickAxes(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return null;
+    }
+
+    public ByteBuffer getJoystickButtons(int joystick) {
+        if (window != 0L)
+            return glfwGetJoystickButtons(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return null;
+    }
+
+    public String getJoystickName(int joystick) {
+        if (window != 0L)
+            return glfwGetJoystickName(joystick);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
+        return "";
     }
 
     public Point getPosition() {
@@ -291,6 +384,13 @@ public class GLFrame {
         backgroundColor = color;
         if (window != 0L)
             GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+    }
+
+    public void setClipboardString(String clipboardString) {
+        if (window != 0L)
+            glfwSetClipboardString(window, clipboardString);
+        else
+            Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
     }
 
     public void setContextVersionMajor(int majorVersion) {
@@ -335,6 +435,10 @@ public class GLFrame {
         this.keyCallback = keyCallback;
         if (window != 0L)
             glfwSetKeyCallback(window, keyCallback);
+    }
+
+    public void setMonitorCallback(GLFWMonitorCallback monitorCallback) {
+        glfwSetMonitorCallback(monitorCallback);
     }
 
     public void setMouseButtonCallback(GLFWMouseButtonCallback mouseButtonCallback) {
