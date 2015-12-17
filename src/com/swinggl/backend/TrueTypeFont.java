@@ -67,7 +67,7 @@ public class TrueTypeFont {
 
         if (Debug.enabled) {
             long endTime = System.nanoTime();
-            Debug.println(" Loaded font: " + filePath + "\n\tTexture size: [" + fontHeight + "px" + "\n\tLoad time: " + Debug.noNotation.format((endTime -
+            Debug.println(" Loaded font: " + filePath + "\n\tFont height: " + fontHeight + "px" + "\n\tLoad time: " + Debug.noNotation.format((endTime -
                     startTime) / 1000000000.0) + "s", Debug.ANSI_CYAN);
         }
     }
