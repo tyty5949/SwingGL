@@ -24,8 +24,6 @@ package com.swinggl.backend;
  */
 
 import com.swinggl.elements.GLFrame;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -44,7 +42,7 @@ public class Debug {
     private static ArrayList<String> variables = new ArrayList<String>();
     private static TrueTypeFont engineFont;
     private static TrueTypeFont engineFontBold;
-    private static Color fontColor = new Color(251, 46, 255);
+    private static Color fontColor = new Color(187, 36, 190);
 
     public static double renderDelta = 0.0;
     public static double updateDelta = 0.0;
@@ -65,8 +63,34 @@ public class Debug {
         System.out.println("Initialized debug");
     }
 
+    private static int renderTimer = 0;
+    private static double renderSum = 0.0;
+    private static double avgRenderDelta = 0.0;
+    private static int updateTimer = 0;
+    private static double updateSum = 0.0;
+    private static double avgUpdateDelta = 0.0;
+
     public static void render() {
         engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
+        engineFontBold.drawString("FPS: ", 2, 42, fontColor);
+        engineFontBold.drawString("UPS: ", 2, 66, fontColor);
+        if (renderTimer == 20) {
+            avgRenderDelta = renderSum / 20;
+            renderTimer = 0;
+            renderSum = 0.0;
+        }
+        if (updateTimer == 20) {
+            avgUpdateDelta = updateSum / 20;
+            updateTimer = 0;
+            updateSum = 0.0;
+        }
+        renderTimer++;
+        updateTimer++;
+        renderSum += renderDelta;
+        updateSum += updateDelta;
+        engineFont.drawString(noNotation.format(1.0 / avgRenderDelta), 50, 42, fontColor);
+        engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 66, fontColor);
+
     }
 
     public void debugVariable(String variablePath) {

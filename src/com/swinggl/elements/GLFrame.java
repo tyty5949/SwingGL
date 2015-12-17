@@ -266,6 +266,7 @@ public class GLFrame {
     }
 
     private void render(float delta) {
+        Debug.renderDelta = delta;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (currentGameState != null) {
@@ -901,6 +902,8 @@ public class GLFrame {
         }
 
         private void update(float delta) {
+            Debug.updateDelta = delta;
+
             if (window != 0L) {
                 if (currentGameState != null) {
                     if (currentGameState.initialized)

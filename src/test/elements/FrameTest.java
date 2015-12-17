@@ -41,6 +41,7 @@ public class FrameTest extends GLPanel {
         GLFrame glFrame = new GLFrame(false);
         glFrame.setSize(1280, 720);
         glFrame.setTitle("This is a test title");
+        glFrame.setPosition(GLFrame.WINDOW_CENTERED);
         glFrame.setPanel(new FrameTest());
         glFrame.setResizable(true);
         glFrame.setMultisampling(16);
