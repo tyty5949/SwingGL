@@ -12,7 +12,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.stb.STBImage.*;
 
 /**
- * Created by jas5973 on 12/16/2015.
+ * Created by John Scalley on 12/16/2015.
+ * <p/>
+ * This class is designed to hold all of the data about a given texture and provide a few commonly needed methods.
  */
 public class Texture {
 
@@ -22,10 +24,22 @@ public class Texture {
     private int comp;
     private boolean hdr;
 
+    /**
+     * Constructor that loads the texture from a path. By default it will use GL_LINEAR for filtering and GL_CLAMP_TO_BORDER for clamping.
+     *
+     * @param imagePath - The path to the image file including file type.
+     */
     public Texture(String imagePath) {
         this(imagePath, GL_LINEAR, GL13.GL_CLAMP_TO_BORDER);
     }
 
+    /**
+     * Constructor that loads the texture from a path. Uses custom filtering and clamping.
+     *
+     * @param imagePath   - The path to the image file including file type.
+     * @param filter      - The filter to use when drawing the texture
+     * @param clampMethod - The clamping to use when drawing the texture
+     */
     public Texture(String imagePath, int filter, int clampMethod) {
         long startTime = 0L;
         if (Debug.enabled)
@@ -73,26 +87,53 @@ public class Texture {
         }
     }
 
+    /**
+     * Used to get the width of the texture as it is given in the file.
+     *
+     * @return - The width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Used to get the height of the texture as it is given in the file.
+     *
+     * @return - The height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Used to get the composition setting of the texture as it is shown in the file. A composition of 3 has no transparency while all other contain some sort
+     * of transparency.
+     *
+     * @return - The composition type
+     */
     public int getComp() {
         return comp;
     }
 
+    /**
+     * Gives whether or not the texture is HDR
+     *
+     * @return - Whether or not the texture is HDR
+     */
     public boolean isHDR() {
         return hdr;
     }
 
+    /**
+     * Binds the texture to the OpenGL context so it knows what texture to reference for rendering.
+     */
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    /**
+     * Removes the image data if memory space needs to be freed.
+     */
     public void delete() {
         nstbi_image_free(id);
     }

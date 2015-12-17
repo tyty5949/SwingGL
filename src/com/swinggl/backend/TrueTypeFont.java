@@ -14,7 +14,9 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Created on 12/16/2015.
+ * Created by Tyler Hunt on 12/16/2015.
+ *
+ *
  */
 public class TrueTypeFont {
 
