@@ -9,7 +9,9 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 /**
- * Created by jas5973 on 12/15/2015.
+ * Created by John Scalley on 12/15/2015.
+ * <p/>
+ * This class holds any utilities for IO operations such as turning files into byte buffers.
  */
 public class IOUtil {
 
@@ -25,22 +27,20 @@ public class IOUtil {
      *
      * @param resource   the resource to read
      * @param bufferSize the initial buffer size
-     *
      * @return the resource data
-     *
      * @throws IOException if an IO error occurs
      */
     public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
         ByteBuffer buffer;
 
         File file = new File(resource);
-        if ( file.isFile() ) {
+        if (file.isFile()) {
             FileInputStream fis = new FileInputStream(file);
             FileChannel fc = fis.getChannel();
 
-            buffer = BufferUtils.createByteBuffer((int)fc.size() + 1);
+            buffer = BufferUtils.createByteBuffer((int) fc.size() + 1);
 
-            while ( fc.read(buffer) != -1 ) ;
+            while (fc.read(buffer) != -1) ;
 
             fis.close();
             fc.close();
@@ -48,17 +48,17 @@ public class IOUtil {
             buffer = BufferUtils.createByteBuffer(bufferSize);
 
             InputStream source = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-            if ( source == null )
+            if (source == null)
                 throw new FileNotFoundException(resource);
 
             try {
                 ReadableByteChannel rbc = Channels.newChannel(source);
                 try {
-                    while ( true ) {
+                    while (true) {
                         int bytes = rbc.read(buffer);
-                        if ( bytes == -1 )
+                        if (bytes == -1)
                             break;
-                        if ( buffer.remaining() == 0 )
+                        if (buffer.remaining() == 0)
                             buffer = resizeBuffer(buffer, buffer.capacity() * 2);
                     }
                 } finally {
