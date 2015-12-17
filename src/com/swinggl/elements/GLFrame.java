@@ -164,7 +164,9 @@ public class GLFrame {
     }
 
     /**
-     *
+     * This method starts the both the render and update loops. The thread that this is called on will become the render loop and occupy that thread entirely.
+     * All glfwWindowHint's must be called before this is called while all other window attributes can be altered while the loop is running including changing
+     * the FPS and UPS.
      */
     public void run() {
         if (fullscreen) {
