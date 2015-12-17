@@ -15,8 +15,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Created by Tyler Hunt on 12/16/2015.
- *
- *
+ * <p/>
+ * This class is designed to hold all of the data for a TrueTypeFont and includes commonly used methods such as drawing text.
  */
 public class TrueTypeFont {
 
@@ -31,6 +31,12 @@ public class TrueTypeFont {
     private FloatBuffer ybuf;
     private STBTTAlignedQuad quad;
 
+    /**
+     * The constructor that creates the font from the given file at the given height.
+     *
+     * @param filePath   - The path to file including the file type
+     * @param fontHeight - The height (size) of the font
+     */
     public TrueTypeFont(String filePath, int fontHeight) {
         this.fontHeight = fontHeight;
 
@@ -66,6 +72,46 @@ public class TrueTypeFont {
         }
     }
 
+    public int getHeight() {
+        return fontHeight;
+    }
+
+    /**
+     * Used to get the width of a string of text in the given font. It is rather inefficient so it is better to generate widths as few times as possible.
+     *
+     * @param text - The text
+     * @return - The width
+     */
+    public float getWidth(String text) {
+        float width = 0;
+        xbuf.put(0, 0.0f);
+        ybuf.put(0, 0.0f);
+        glBegin(GL_QUADS);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\n') {
+                ybuf.put(0, ybuf.get(0) + fontHeight);
+                xbuf.put(0, 0.0f);
+                continue;
+            } else if (c < 32 || 128 <= c)
+                continue;
+
+            STBTruetype.stbtt_GetBakedQuad(cdata, BITMAP_W, BITMAP_H, c - 32, xbuf, ybuf, quad, 1);
+
+            glVertex2f(quad.x0(), quad.y0());
+            width += quad.x1() - quad.x0();
+        }
+        return width;
+    }
+
+    /**
+     * Used to draw a string of text on the current GLPanel
+     *
+     * @param text  - The text
+     * @param x     - The x coordinate
+     * @param y     - The y coordinate
+     * @param color - The color of the text
+     */
     public void drawString(String text, float x, float y, Color color) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
