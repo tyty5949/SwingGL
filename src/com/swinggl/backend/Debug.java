@@ -45,6 +45,10 @@ public class Debug {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    public static void initialize() {
+        
+    }
+
     public static void println(String text, String color) {
         System.out.println(color + "[SwingGL] " + text + ANSI_RESET);
     }

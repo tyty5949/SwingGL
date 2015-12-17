@@ -220,6 +220,8 @@ public class GLFrame {
         GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
                 backgroundColor.getAlpha() / 255f);
 
+        Debug.initialize();
+
         if (visible)
             glfwShowWindow(window);
 
@@ -298,6 +300,14 @@ public class GLFrame {
     }
 
     /**
+     * Disables the debugging views and interfaces
+     */
+    public void disableDebugging() {
+        debug = true;
+        Debug.enabled = false;
+    }
+
+    /**
      * Locks the mouse to the center of the screen and make the cursor invisible
      */
     public void disableMouse() {
@@ -331,6 +341,14 @@ public class GLFrame {
         mouseDisabled = false;
         if (window != 0L)
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    /**
+     * Enables the debugging views and interfaces
+     */
+    public void enableDebugging() {
+        debug = true;
+        Debug.enabled = true;
     }
 
     /**
