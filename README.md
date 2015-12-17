@@ -20,6 +20,8 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   
 #### Backend Features
   - Variable Multi-Threaded Game Loop
+  - Textures
+  - TrueTypeFonts
 
 #### Planned Backend Features
   - Dubugging/Console Interface
@@ -27,4 +29,3 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Entities
   - Sprites
   - Sprite-Sheets
-  - TrueType Fonts
