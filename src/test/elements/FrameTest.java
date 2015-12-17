@@ -23,7 +23,6 @@ package test.elements;
 
  */
 
-import com.swinggl.backend.Debug;
 import com.swinggl.backend.Texture;
 import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.elements.GLFrame;
@@ -58,7 +57,6 @@ public class FrameTest extends GLPanel {
 
         font = new TrueTypeFont("res/test/font.ttf", 24);
 
-        System.out.println("Initialized FrameTest");
         initialized = true;
     }
 
@@ -83,7 +81,7 @@ public class FrameTest extends GLPanel {
         GL11.glVertex2f(0f, 720);
         GL11.glEnd();
 
-        font.drawString("Hello TTF's", 100, 100, Color.RED);
+        font.drawString("Hello TTF's", 600, 100, Color.RED);
     }
 
     @Override

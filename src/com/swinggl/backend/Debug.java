@@ -60,7 +60,6 @@ public class Debug {
     public static void initialize() {
         engineFont = new TrueTypeFont("res/fonts/swinggl.ttf", 24);
         engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.ttf", 24);
-        System.out.println("Initialized debug");
     }
 
     private static int renderTimer = 0;
@@ -70,10 +69,13 @@ public class Debug {
     private static double updateSum = 0.0;
     private static double avgUpdateDelta = 0.0;
 
-    public static void render() {
+    public static void render(GLFrame frame) {
         engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
-        engineFontBold.drawString("FPS: ", 2, 42, fontColor);
-        engineFontBold.drawString("UPS: ", 2, 66, fontColor);
+        engineFontBold.drawString("FPS:", 2, 38, fontColor);
+        engineFontBold.drawString("UPS:", 2, 58, fontColor);
+        engineFontBold.drawString("Current GLPanel:", 2, 78, fontColor);
+        engineFont.drawString(frame.getPanel().toString(), 180, 78, fontColor);
+
         if (renderTimer == 20) {
             avgRenderDelta = renderSum / 20;
             renderTimer = 0;
@@ -88,8 +90,8 @@ public class Debug {
         updateTimer++;
         renderSum += renderDelta;
         updateSum += updateDelta;
-        engineFont.drawString(noNotation.format(1.0 / avgRenderDelta), 50, 42, fontColor);
-        engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 66, fontColor);
+        engineFont.drawString(noNotation.format(1.0 / avgRenderDelta), 50, 38, fontColor);
+        engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 58, fontColor);
 
     }
 

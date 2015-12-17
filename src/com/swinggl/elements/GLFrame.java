@@ -276,7 +276,7 @@ public class GLFrame {
                 currentGameState.init(this);
         }
 
-        Debug.render();
+        Debug.render(this);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -499,6 +499,15 @@ public class GLFrame {
         else
             Debug.println("GLFW Window must be initialized first!", Debug.ANSI_YELLOW);
         return "";
+    }
+
+    /**
+     * Gives the GLPanel that is currently be rendered and updated by the frame
+     *
+     * @return - The panel
+     */
+    public GLPanel getPanel() {
+        return currentGameState;
     }
 
     /**
