@@ -23,6 +23,10 @@ package com.swinggl.backend;
 
  */
 
+import com.swinggl.elements.GLFrame;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
+
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -38,8 +42,9 @@ public class Debug {
     public static final NumberFormat noNotation = new DecimalFormat("###.#####");
 
     private static ArrayList<String> variables = new ArrayList<String>();
-    private TrueTypeFont engineFont;
-    private TrueTypeFont engineFontBold;
+    private static TrueTypeFont engineFont;
+    private static TrueTypeFont engineFontBold;
+    private static Color fontColor = new Color(251, 46, 255);
 
     public static double renderDelta = 0.0;
     public static double updateDelta = 0.0;
@@ -54,14 +59,14 @@ public class Debug {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public Debug() {
-        engineFont = new TrueTypeFont("res/fonts/swinggl.otf", 24);
-        engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.otf", 24);
+    public static void initialize() {
+        engineFont = new TrueTypeFont("res/fonts/swinggl.ttf", 24);
+        engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.ttf", 24);
         System.out.println("Initialized debug");
     }
 
-    public void render() {
-        engineFont.drawString("SwingGL v", 100, 100, Color.GREEN);
+    public static void render() {
+        engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
     }
 
     public void debugVariable(String variablePath) {

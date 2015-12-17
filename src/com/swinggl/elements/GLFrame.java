@@ -59,7 +59,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public class GLFrame {
 
-    public static final String VERSION = "1.0a";
+    public static final String VERSION = "1.0.0a";
 
     public static final int WINDOW_CENTERED = 0;
     public static final int WINDOW_TOP_LEFT = 1;
@@ -106,7 +106,6 @@ public class GLFrame {
     private boolean mouseDisabled = false;
     private boolean mouseHidden = false;
 
-    private Debug debug;
     private GLPanel currentGameState;
 
     /**
@@ -222,6 +221,8 @@ public class GLFrame {
         GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
                 backgroundColor.getAlpha() / 255f);
 
+        Debug.initialize();
+
         if (visible)
             glfwShowWindow(window);
 
@@ -232,8 +233,6 @@ public class GLFrame {
         long lastRender = now;
 
         running = true;
-
-        debug = new Debug();
 
         while (running) {
             if (glfwWindowShouldClose(window) == GL_TRUE)
@@ -276,8 +275,7 @@ public class GLFrame {
                 currentGameState.init(this);
         }
 
-        if (Debug.enabled)
-            debug.render();
+        Debug.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

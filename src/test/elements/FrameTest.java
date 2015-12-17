@@ -23,10 +23,14 @@ package test.elements;
 
  */
 
+import com.swinggl.backend.Debug;
 import com.swinggl.backend.Texture;
 import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 /**
  * Created on 12/13/2015.
@@ -49,9 +53,9 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void init(GLFrame frame) {
-        //tex = new Texture("res/test/backend/file2.png");
+        tex = new Texture("res/test/backend/file2.png");
 
-        //font = new TrueTypeFont("res/test/font.ttf", 24);
+        font = new TrueTypeFont("res/test/font.ttf", 24);
 
         System.out.println("Initialized FrameTest");
         initialized = true;
@@ -64,7 +68,7 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void render(GLFrame frame, float delta) {
-        /*
+
         GL11.glColor3f(1f, 1f, 1f);
         tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
@@ -79,7 +83,6 @@ public class FrameTest extends GLPanel {
         GL11.glEnd();
 
         font.drawString("Hello TTF's", 100, 100, Color.RED);
-        */
     }
 
     @Override
