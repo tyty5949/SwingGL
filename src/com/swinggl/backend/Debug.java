@@ -23,8 +23,10 @@ package com.swinggl.backend;
 
  */
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 
 /**
  * Created on 12/13/2015.
@@ -34,6 +36,13 @@ public class Debug {
     public static boolean enabled;
 
     public static final NumberFormat noNotation = new DecimalFormat("###.#####");
+
+    private static ArrayList<String> variables = new ArrayList<String>();
+    private TrueTypeFont engineFont;
+    private TrueTypeFont engineFontBold;
+
+    public static double renderDelta = 0.0;
+    public static double updateDelta = 0.0;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -45,8 +54,18 @@ public class Debug {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static void initialize() {
-        
+    public Debug() {
+        engineFont = new TrueTypeFont("res/fonts/swinggl.otf", 24);
+        engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.otf", 24);
+        System.out.println("Initialized debug");
+    }
+
+    public void render() {
+        engineFont.drawString("SwingGL v", 100, 100, Color.GREEN);
+    }
+
+    public void debugVariable(String variablePath) {
+
     }
 
     public static void println(String text, String color) {

@@ -59,6 +59,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public class GLFrame {
 
+    public static final String VERSION = "1.0a";
+
     public static final int WINDOW_CENTERED = 0;
     public static final int WINDOW_TOP_LEFT = 1;
     public static final int WINDOW_TOP_RIGHT = 2;
@@ -86,7 +88,6 @@ public class GLFrame {
     private boolean running = false;
     private float updateDelta = 0.0f;
     private float renderDelta = 0.0f;
-    private boolean debug = true;
 
     // Window Attributes
     private String title = "SwingGL - GLFrame";
@@ -105,6 +106,7 @@ public class GLFrame {
     private boolean mouseDisabled = false;
     private boolean mouseHidden = false;
 
+    private Debug debug;
     private GLPanel currentGameState;
 
     /**
@@ -140,8 +142,8 @@ public class GLFrame {
      */
     public GLFrame(boolean fullscreen, long secondWindowHandle) {
         System.setProperty("java.awt.headless", "true");
-        System.setProperty("org.lwjgl.util.Debug", "" + debug);
-        Debug.enabled = debug;
+        System.setProperty("org.lwjgl.util.Debug", "true");
+        Debug.enabled = false;
         Thread.currentThread().setName("SwingGL | render");
         this.fullscreen = fullscreen;
         this.secondWindowHandle = secondWindowHandle;
@@ -220,8 +222,6 @@ public class GLFrame {
         GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
                 backgroundColor.getAlpha() / 255f);
 
-        Debug.initialize();
-
         if (visible)
             glfwShowWindow(window);
 
@@ -232,6 +232,8 @@ public class GLFrame {
         long lastRender = now;
 
         running = true;
+
+        debug = new Debug();
 
         while (running) {
             if (glfwWindowShouldClose(window) == GL_TRUE)
@@ -274,6 +276,9 @@ public class GLFrame {
                 currentGameState.init(this);
         }
 
+        if (Debug.enabled)
+            debug.render();
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -303,7 +308,6 @@ public class GLFrame {
      * Disables the debugging views and interfaces
      */
     public void disableDebugging() {
-        debug = true;
         Debug.enabled = false;
     }
 
@@ -347,7 +351,6 @@ public class GLFrame {
      * Enables the debugging views and interfaces
      */
     public void enableDebugging() {
-        debug = true;
         Debug.enabled = true;
     }
 
