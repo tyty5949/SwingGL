@@ -32,6 +32,10 @@ public class TrueTypeFont {
     public TrueTypeFont(String filePath, int fontHeight) {
         this.fontHeight = fontHeight;
 
+        long startTime = 0L;
+        if (Debug.enabled)
+            startTime = System.nanoTime();
+
         textureID = glGenTextures();
         cdata = STBTTBakedChar.malloc(96);
 
@@ -52,6 +56,12 @@ public class TrueTypeFont {
         xbuf = BufferUtils.createFloatBuffer(1);
         ybuf = BufferUtils.createFloatBuffer(1);
         quad = STBTTAlignedQuad.malloc();
+
+        if (Debug.enabled) {
+            long endTime = System.nanoTime();
+            Debug.println(" Loaded font: " + filePath + "\n\tTexture size: [" + fontHeight + "px" + "\n\tLoad time: " + Debug.noNotation.format((endTime -
+                    startTime) / 1000000000.0) + "s", Debug.ANSI_CYAN);
+        }
     }
 
     public void drawString(String text, float x, float y, Color color) {
