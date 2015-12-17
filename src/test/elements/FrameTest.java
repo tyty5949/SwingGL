@@ -23,14 +23,10 @@ package test.elements;
 
  */
 
-import com.swinggl.backend.Debug;
 import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
-import com.swinggl.util.IOUtil;
 import org.lwjgl.opengl.GL11;
-
-import java.io.IOException;
 
 /**
  * Created on 12/13/2015.
@@ -43,23 +39,14 @@ public class FrameTest extends GLPanel {
         glFrame.setTitle("This is a test title");
         glFrame.setPanel(new FrameTest());
         glFrame.setResizable(true);
+        glFrame.setMultisampling(16);
         glFrame.run();
     }
 
     private Texture tex;
     @Override
     public void init(GLFrame frame) {
-        for(int i = 0; i < 10; i++) {
-            long startTime = System.nanoTime();
-            try{
-                IOUtil.createBufferFromFile("res/test/backend/file.jpg",(16*1024));
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-            tex = new Texture("res/test/backend/file.jpg");
-            long endTime = System.nanoTime();
-            Debug.println("" + ((endTime - startTime) / 1000000000.0));
-        }
+        tex = new Texture("res/test/backend/file2.png");
 
         initialized = true;
     }
@@ -71,17 +58,17 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void render(GLFrame frame, float delta) {
-        GL11.glColor3f(0f, 1f, 1f);
+        GL11.glColor3f(1f, 1f, 1f);
         tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2f(0f,0f);
         GL11.glVertex2f(0f, 0f);
-        GL11.glTexCoord2f(100f,0f);
-        GL11.glVertex2f(100f, 0f);
-        GL11.glTexCoord2f(100f,100f);
-        GL11.glVertex2f(100f, 100f);
-        GL11.glTexCoord2f(0f,100f);
-        GL11.glVertex2f(0f, 100f);
+        GL11.glTexCoord2f(1f,0f);
+        GL11.glVertex2f(1280, 0f);
+        GL11.glTexCoord2f(1f,1f);
+        GL11.glVertex2f(1280, 720);
+        GL11.glTexCoord2f(0f,1f);
+        GL11.glVertex2f(0f, 720);
         GL11.glEnd();
     }
 

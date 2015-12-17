@@ -23,10 +23,17 @@ package com.swinggl.backend;
 
  */
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created on 12/13/2015.
  */
 public class Debug {
+
+    public static boolean enabled;
+
+    public static final NumberFormat noNotation = new DecimalFormat("###.#####");
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
