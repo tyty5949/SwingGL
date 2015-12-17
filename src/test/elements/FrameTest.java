@@ -24,9 +24,12 @@ package test.elements;
  */
 
 import com.swinggl.backend.Texture;
+import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 /**
  * Created on 12/13/2015.
@@ -44,9 +47,13 @@ public class FrameTest extends GLPanel {
     }
 
     private Texture tex;
+    private TrueTypeFont font;
+
     @Override
     public void init(GLFrame frame) {
         tex = new Texture("res/test/backend/file2.png");
+
+        font = new TrueTypeFont("res/test/font.ttf", 24);
 
         initialized = true;
     }
@@ -61,15 +68,17 @@ public class FrameTest extends GLPanel {
         GL11.glColor3f(1f, 1f, 1f);
         tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2f(0f,0f);
+        GL11.glTexCoord2f(0f, 0f);
         GL11.glVertex2f(0f, 0f);
-        GL11.glTexCoord2f(1f,0f);
+        GL11.glTexCoord2f(1f, 0f);
         GL11.glVertex2f(1280, 0f);
-        GL11.glTexCoord2f(1f,1f);
+        GL11.glTexCoord2f(1f, 1f);
         GL11.glVertex2f(1280, 720);
-        GL11.glTexCoord2f(0f,1f);
+        GL11.glTexCoord2f(0f, 1f);
         GL11.glVertex2f(0f, 720);
         GL11.glEnd();
+
+        font.drawString("Hello TTF's", 100, 100, Color.RED);
     }
 
     @Override
