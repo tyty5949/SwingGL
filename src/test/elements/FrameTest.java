@@ -23,6 +23,7 @@ package test.elements;
 
  */
 
+import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
 import org.lwjgl.opengl.GL11;
@@ -37,11 +38,16 @@ public class FrameTest extends GLPanel {
         glFrame.setSize(1280, 720);
         glFrame.setTitle("This is a test title");
         glFrame.setPanel(new FrameTest());
+        glFrame.setResizable(true);
+        glFrame.setMultisampling(16);
         glFrame.run();
     }
 
+    private Texture tex;
     @Override
     public void init(GLFrame frame) {
+        tex = new Texture("res/test/backend/file2.png");
+
         initialized = true;
     }
 
@@ -52,12 +58,17 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void render(GLFrame frame, float delta) {
-        GL11.glColor3f(0f, 1f, 1f);
+        GL11.glColor3f(1f, 1f, 1f);
+        tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
+        GL11.glTexCoord2f(0f,0f);
         GL11.glVertex2f(0f, 0f);
-        GL11.glVertex2f(100f, 0f);
-        GL11.glVertex2f(100f, 100f);
-        GL11.glVertex2f(0f, 100f);
+        GL11.glTexCoord2f(1f,0f);
+        GL11.glVertex2f(1280, 0f);
+        GL11.glTexCoord2f(1f,1f);
+        GL11.glVertex2f(1280, 720);
+        GL11.glTexCoord2f(0f,1f);
+        GL11.glVertex2f(0f, 720);
         GL11.glEnd();
     }
 

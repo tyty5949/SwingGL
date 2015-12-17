@@ -86,7 +86,7 @@ public class GLFrame {
     private boolean running = false;
     private float updateDelta = 0.0f;
     private float renderDelta = 0.0f;
-    private boolean debug;
+    private boolean debug = true;
 
     // Window Attributes
     private String title = "SwingGL - GLFrame";
@@ -140,6 +140,8 @@ public class GLFrame {
      */
     public GLFrame(boolean fullscreen, long secondWindowHandle) {
         System.setProperty("java.awt.headless", "true");
+        System.setProperty("org.lwjgl.util.Debug", "" + debug);
+        Debug.enabled = debug;
         Thread.currentThread().setName("SwingGL | render");
         this.fullscreen = fullscreen;
         this.secondWindowHandle = secondWindowHandle;
