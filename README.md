@@ -5,9 +5,9 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Window Frames
   - Window Panels
   - Buttons
+  - Check Boxes
 
 #### Planned UI Elements
-  - Check Boxes
   - Radio Buttons
   - Combo Boxes
   - Dialogues
