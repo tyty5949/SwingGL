@@ -269,12 +269,19 @@ public class GLFrame {
         Debug.renderDelta = delta;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        long startTime = 0L;
+        if(Debug.enabled)
+            startTime = System.nanoTime();
+
         if (currentGameState != null) {
             if (currentGameState.initialized)
                 currentGameState.render(this, delta);
             else
                 currentGameState.init(this);
         }
+
+        if(Debug.enabled)
+            Debug.renderTime = System.nanoTime() - startTime;
 
         Debug.render(this);
 

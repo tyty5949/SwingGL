@@ -54,8 +54,7 @@ public class FrameTest extends GLPanel {
     @Override
     public void init(GLFrame frame) {
         tex = new Texture("res/test/backend/file2.png");
-
-        font = new TrueTypeFont("res/test/font.ttf", 24);
+        font = new TrueTypeFont("res/test/font.ttf", 32);
 
         initialized = true;
     }
@@ -67,7 +66,6 @@ public class FrameTest extends GLPanel {
 
     @Override
     public void render(GLFrame frame, float delta) {
-
         GL11.glColor3f(1f, 1f, 1f);
         tex.bind();
         GL11.glBegin(GL11.GL_QUADS);
@@ -81,7 +79,7 @@ public class FrameTest extends GLPanel {
         GL11.glVertex2f(0f, 720);
         GL11.glEnd();
 
-        font.drawString("Hello TTF's", 600, 100, Color.RED);
+        font.drawString("This is a test string!", 400, 100, Color.BLUE);
     }
 
     @Override

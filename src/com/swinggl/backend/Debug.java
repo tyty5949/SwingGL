@@ -37,7 +37,8 @@ public class Debug {
 
     public static boolean enabled;
 
-    public static final NumberFormat noNotation = new DecimalFormat("###.#####");
+    public static final NumberFormat noNotation = new DecimalFormat("###.######");
+    public static final NumberFormat noNotationLong = new DecimalFormat("###.###########");
 
     private static ArrayList<String> variables = new ArrayList<String>();
     private static TrueTypeFont engineFont;
@@ -46,6 +47,8 @@ public class Debug {
 
     public static double renderDelta = 0.0;
     public static double updateDelta = 0.0;
+    public static long renderTime = 0L;
+    public static long updateTime = 0L;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -62,36 +65,41 @@ public class Debug {
         engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.ttf", 24);
     }
 
-    private static int renderTimer = 0;
+    private static int timer = 0;
     private static double renderSum = 0.0;
     private static double avgRenderDelta = 0.0;
-    private static int updateTimer = 0;
     private static double updateSum = 0.0;
     private static double avgUpdateDelta = 0.0;
+    private static long renderTimeSum = 0L;
+    private static double avgRenderTime = 0.0;
 
     public static void render(GLFrame frame) {
-        engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
-        engineFontBold.drawString("FPS:", 2, 38, fontColor);
-        engineFontBold.drawString("UPS:", 2, 58, fontColor);
-        engineFontBold.drawString("Current GLPanel:", 2, 78, fontColor);
-        engineFont.drawString(frame.getPanel().toString(), 180, 78, fontColor);
+        if(enabled) {
+            engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
+            engineFontBold.drawString("FPS:", 2, 38, fontColor);
+            engineFontBold.drawString("UPS:", 2, 58, fontColor);
+            engineFontBold.drawString("Current GLPanel:", 2, 78, fontColor);
+            engineFont.drawString(frame.getPanel().toString(), 180, 78, fontColor);
+            engineFontBold.drawString("Render time:", 2, 98, fontColor);
 
-        if (renderTimer == 20) {
-            avgRenderDelta = renderSum / 20;
-            renderTimer = 0;
-            renderSum = 0.0;
+            renderSum += renderDelta;
+            updateSum += updateDelta;
+            renderTimeSum += renderTime;
+            if (timer == 20) {
+                avgRenderDelta = renderSum / 20.0;
+                renderSum = 0.0;
+                avgUpdateDelta = updateSum / 20.0;
+                updateSum = 0.0;
+                avgRenderTime = renderTimeSum / 20.0;
+                renderTimeSum = 0L;
+                timer = 0;
+            }
+            timer++;
+            engineFont.drawString(noNotation.format(1.0 / avgRenderDelta), 50, 38, fontColor);
+            engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 58, fontColor);
+            engineFont.drawString(noNotation.format(avgRenderTime) + "ns", 140, 98, fontColor);
+            engineFont.drawString(noNotationLong.format(avgRenderTime / 1000000000.0) + "s", 140, 118, fontColor);
         }
-        if (updateTimer == 20) {
-            avgUpdateDelta = updateSum / 20;
-            updateTimer = 0;
-            updateSum = 0.0;
-        }
-        renderTimer++;
-        updateTimer++;
-        renderSum += renderDelta;
-        updateSum += updateDelta;
-        engineFont.drawString(noNotation.format(1.0 / avgRenderDelta), 50, 38, fontColor);
-        engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 58, fontColor);
 
     }
 
