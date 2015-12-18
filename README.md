@@ -27,3 +27,7 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Entities
   - Sprites
   - Sprite-Sheets
+
+### TODO
+  - GLFrame needs events rather than actually calling the OpenGL functions from its methods. Ex. frame.setBackground should be able to be called anywhere, not just in the render or initialize method where there is OpenGL context. It should trigger and event and the next time render runs it should set the background.
+  - Figure out why the TrueTypeFont class does not generate accurate widths and heights
