@@ -33,17 +33,17 @@ import org.lwjgl.glfw.GLFWScrollCallback;
  */
 public class Mouse {
 
-    private static double x;
-    private static double y;
+    private static float x;
+    private static float y;
     private static boolean[] buttons = new boolean[8];
     private static int scrollDX;
     private static int scrollDY;
 
-    public static double getX() {
+    public static float getX() {
         return x;
     }
 
-    public static double getY() {
+    public static float getY() {
         return y;
     }
 
@@ -67,8 +67,8 @@ public class Mouse {
 
         @Override
         public void invoke(long window, double xpos, double ypos) {
-            x = xpos;
-            y = ypos;
+            x = (float) xpos;
+            y = (float) ypos;
         }
     }
 
