@@ -72,8 +72,31 @@ public class TrueTypeFont {
         }
     }
 
-    public int getHeight() {
-        return fontHeight;
+    /**
+     * Used to get the width of a string of text in the given font. It is rather inefficient so it is better to generate widths as few times as possible.
+     *
+     * @param text - The text
+     * @return - The width
+     */
+    public float getHeight(String text) {
+        float height = 0;
+        xbuf.put(0, 0.0f);
+        ybuf.put(0, 0.0f);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\n') {
+                ybuf.put(0, ybuf.get(0) + fontHeight);
+                xbuf.put(0, 0.0f);
+                continue;
+            } else if (c < 32 || 128 <= c)
+                continue;
+
+            STBTruetype.stbtt_GetBakedQuad(cdata, BITMAP_W, BITMAP_H, c - 32, xbuf, ybuf, quad, 1);
+
+            if (quad.y1() - quad.y0() > height)
+                height = quad.y1() - quad.y0();
+        }
+        return height;
     }
 
     /**
@@ -86,7 +109,6 @@ public class TrueTypeFont {
         float width = 0;
         xbuf.put(0, 0.0f);
         ybuf.put(0, 0.0f);
-        glBegin(GL_QUADS);
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             if (c == '\n') {
@@ -98,8 +120,7 @@ public class TrueTypeFont {
 
             STBTruetype.stbtt_GetBakedQuad(cdata, BITMAP_W, BITMAP_H, c - 32, xbuf, ybuf, quad, 1);
 
-            glVertex2f(quad.x0(), quad.y0());
-            width += quad.x1() - quad.x0();
+            width += quad.x1() - quad.x0() + 1.5f;
         }
         return width;
     }
@@ -120,7 +141,7 @@ public class TrueTypeFont {
         glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
 
         glPushMatrix();
-        glTranslatef(x, y, 0f);
+        glTranslatef(x, y + (fontHeight * .5f), 0f);
 
         xbuf.put(0, 0.0f);
         ybuf.put(0, 0.0f);
