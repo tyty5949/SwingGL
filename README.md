@@ -29,6 +29,6 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Sprite-Sheets
 
 ### TODO
-  - GLFrame needs events rather than actually calling the OpenGL functions from its methods. Ex. frame.setBackground should be able to be called anywhere, not just in the render or initialize method where there is OpenGL context. It should trigger and event and the next time render runs it should set the background.
+  - GLFrame needs events rather than actually calling the OpenGL functions from its methods. Ex. frame.setBackground should be able to be called anywhere, not just in the render or initialize method where there is OpenGL context. It should trigger an event and the next time render runs it should set the background.
   - Figure out why the TrueTypeFont class does not generate accurate widths and heights
   - SpriteSheetUtil that will allow multiple spritesheet objects of the same size to be loaded. Such that only one group of texture coordinates must be supplied to GLButton. The method will calculate the others that are directly to the right of it.
