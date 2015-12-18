@@ -7,6 +7,8 @@ import com.swinggl.elements.GLPanel;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created on 12/17/2015.
@@ -30,12 +32,14 @@ public class ButtonTest extends GLPanel {
     private GLButton button;
 
     @Override
-    public void init(GLFrame frame) {
+    public void init(final GLFrame frame) {
         tex = new Texture("res/test/backend/button.png");
-        button = new GLButton(300, 100, 256, 256, new float[][]{
-                {0f, 0f, .25f, 0f, .25f, 1f, 0f, 1f},
-                {.25f, 0f, .5f, 0f, .5f, 1f, .25f, 1f},
-                {.5f, 0f, .75f, 0f, .75f, 1f, .5f, 1f}});
+        button = new GLButton(300, 100, 256, 256, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("pressed");
+            }
+        }, new float[][]{{0f, 0f, .25f, 0f, .25f, 1f, 0f, 1f}, {.25f, 0f, .5f, 0f, .5f, 1f, .25f, 1f}, {.5f, 0f, .75f, 0f, .75f, 1f, .5f, 1f}});
 
         initialized = true;
     }
