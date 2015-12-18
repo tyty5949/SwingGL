@@ -11,10 +11,17 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Radio Buttons
   - Combo Boxes
   - Dialogues
-  - Text Boxes
   - Text Fields
+  - Text Areas
   - Scroll Bars
   - Scrollable Lists
+  - Password Fields
+  - Progress Bars
+  - Sliders
+  - Spinners
+  - Tool Tips
+  - Tool Bars
+  - Color Chooser ?
   
 #### Backend Features
   - Variable Multi-Threaded Game Loop
