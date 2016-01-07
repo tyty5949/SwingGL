@@ -4,6 +4,7 @@ import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLButton;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import com.swinggl.util.SpriteSheet;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -39,7 +40,7 @@ public class ButtonTest extends GLPanel {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("pressed");
             }
-        }, new float[][]{{0f, 0f, .25f, 0f, .25f, 1f, 0f, 1f}, {.25f, 0f, .5f, 0f, .5f, 1f, .25f, 1f}, {.5f, 0f, .75f, 0f, .75f, 1f, .5f, 1f}});
+        }, SpriteSheet.getGLButtonCoords(0f, 0f, 256f, 256f, tex));
 
         initialized = true;
     }

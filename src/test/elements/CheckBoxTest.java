@@ -4,9 +4,12 @@ import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLCheckBox;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import com.swinggl.util.SpriteSheet;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Created on 12/17/2015.
@@ -31,11 +34,12 @@ public class CheckBoxTest extends GLPanel {
     @Override
     public void init(final GLFrame frame) {
         tex = new Texture("res/test/backend/checkbox.png");
-        checkBox = new GLCheckBox(100f, 100f, 32f, 32f, false, new float[][]{
-                {0f, 0f, .25f, 0f, .25f, 1f, 0f, 1f},
-                {.25f, 0f, .5f, 0f, .5f, 1f, .25f, 1f},
-                {.5f, 0f, .75f, 0f, .75f, 1f, .5f, 1f},
-                {.75f, 0f, 1f, 0f, 1f, 1f, .75f, 1f}});
+        checkBox = new GLCheckBox(100f, 100f, 32f, 32f, false, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(e.getActionCommand());
+            }
+        }, SpriteSheet.getGLCheckBoxCoords(0f, 0f, 32f, 32f, tex));
 
         initialized = true;
     }

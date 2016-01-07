@@ -2,7 +2,7 @@ package com.swinggl.elements;
 
 import com.swinggl.backend.Button;
 import com.swinggl.backend.Mouse;
-import org.lwjgl.opengl.GL11;
+import com.swinggl.util.RenderUtil;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,13 +35,6 @@ public class GLButton extends Button {
     }
 
     public void renderButton() {
-        GL11.glTexCoord2f(texCoords[state][0], texCoords[state][1]);
-        GL11.glVertex2f(x, y);
-        GL11.glTexCoord2f(texCoords[state][2], texCoords[state][3]);
-        GL11.glVertex2f(x + w, y);
-        GL11.glTexCoord2f(texCoords[state][4], texCoords[state][5]);
-        GL11.glVertex2f(x + w, y + h);
-        GL11.glTexCoord2f(texCoords[state][6], texCoords[state][7]);
-        GL11.glVertex2f(x, y + h);
+        RenderUtil.drawImmediateTexture(x, y, w, h, texCoords[state]);
     }
 }
