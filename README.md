@@ -6,6 +6,11 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Window Panels
   - Buttons
   - Check Boxes
+  
+#### Backend Features
+  - Variable Multi-Threaded Game Loop
+  - Textures
+  - TrueTypeFonts
 
 #### Planned UI Elements
   - Radio Buttons
@@ -22,11 +27,6 @@ A library that uses the Java OpenGL port LWJGL to render UI elements and other 2
   - Tool Tips
   - Tool Bars
   - Color Chooser ?
-  
-#### Backend Features
-  - Variable Multi-Threaded Game Loop
-  - Textures
-  - TrueTypeFonts
 
 #### Planned Backend Features
   - Dubugging/Console Interface
