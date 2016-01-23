@@ -5,7 +5,9 @@ import com.swinggl.backend.Keyboard;
 import com.swinggl.backend.Mouse;
 import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.util.RenderUtil;
+import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,8 +15,6 @@ import java.awt.event.ActionListener;
  * Created on 1/6/2016.
  */
 public class GLTextBox extends Button {
-
-    private int x
 
     private float x;
     private float y;
@@ -41,14 +41,14 @@ public class GLTextBox extends Button {
     }
 
     public void update() {
-        if (contains(Mouse.getX(), Mouse.getY())) {
-            state = 1;
-            if (Mouse.isButtonDown(0) && !mouseCooldown) {
-                state = 2;
-                listener.actionPerformed(new ActionEvent(this, 0, "clicked"));
-            }
-        } else
-            state = 0;
+        if (Mouse.isButtonDown(0) && !mouseCooldown) {
+            if (contains(Mouse.getX(), Mouse.getY())) {
+                state = 1;
+                listener.actionPerformed(new ActionEvent(this, 0, "pressed"));
+            } else
+                state = 0;
+        }
+
         mouseCooldown = Mouse.isButtonDown(0);
 
         if (state == 1) {
@@ -61,5 +61,8 @@ public class GLTextBox extends Button {
 
     public void render() {
         RenderUtil.drawImmediateTexture(x, y, w, h, texCoords[state]);
+        GL11.glEnd();
+        font.drawString(text, x, y, Color.BLACK);
+        GL11.glBegin(GL11.GL_QUADS);
     }
 }

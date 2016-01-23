@@ -61,4 +61,30 @@ public class SpriteSheet {
         }
         return temp;
     }
+
+    /**
+     * Convenience method that gets all of the texture coordinates for a textbox in a spritesheet. The spritesheet MUST contain 2 textures of the same size
+     * and they MUST be in line from left to right.
+     *
+     * @param x   - The x coord of the first textbox on the texture
+     * @param y   - The y coord of the first textbox on the texture
+     * @param w   - The width of the textbox in the texture
+     * @param h   - The height of the textbox in the texture
+     * @param tex - The texture that contains the data for the textbox
+     * @return - The fully populated float array with every texture coordinate
+     */
+    public static float[][] getGLTextBoxCoords(float x, float y, float w, float h, Texture tex) {
+        float[][] temp = new float[][]{
+                {x, y, x + w, y, x + w, y + h, x, y + h},
+                {x + w, y, x + w + w, y, x + w + w, y + h, x + w, y + h}};
+        for (int i = 0; i < temp.length; i++) {
+            for (int j = 0; j < temp[i].length; j++) {
+                if (j % 2 == 0)
+                    temp[i][j] = temp[i][j] / (float) tex.getWidth();
+                else
+                    temp[i][j] = temp[i][j] / (float) tex.getHeight();
+            }
+        }
+        return temp;
+    }
 }
