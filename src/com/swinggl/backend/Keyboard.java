@@ -59,7 +59,7 @@ public class Keyboard extends GLFWKeyCallback {
         return recentKey;
     }
 
-    public char toAscii(int key) {
+    public static char toAscii(int key) {
         return (char) key;
     }
 }
