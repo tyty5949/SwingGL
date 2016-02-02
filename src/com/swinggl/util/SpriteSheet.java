@@ -87,4 +87,25 @@ public class SpriteSheet {
         }
         return temp;
     }
+
+    /**
+     * Convenience method that gets the texture coordinates for a rectangle
+     *
+     * @param x   - The x coord of the first textbox on the texture
+     * @param y   - The y coord of the first textbox on the texture
+     * @param w   - The width of the textbox in the texture
+     * @param h   - The height of the textbox in the texture
+     * @param tex - The texture that contains the data for the textbox
+     * @return - The fully populated float array with every texture coordinate
+     */
+    public static float[] getRectCoords(float x, float y, float w, float h, Texture tex) {
+        float[] temp = new float[]{x, y, x + w, y, x + w, y + h, x, y + h};
+        for (int j = 0; j < temp.length; j++) {
+            if (j % 2 == 0)
+                temp[j] = temp[j] / (float) tex.getWidth();
+            else
+                temp[j] = temp[j] / (float) tex.getHeight();
+        }
+        return temp;
+    }
 }
