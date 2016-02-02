@@ -27,9 +27,8 @@ import com.swinggl.backend.Texture;
 import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import com.swinggl.util.GLColor;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 /**
  * Created on 12/13/2015.
@@ -79,7 +78,7 @@ public class FrameTest extends GLPanel {
         GL11.glVertex2f(0f, 720);
         GL11.glEnd();
 
-        font.drawString("This is a test string!", 400, 100, Color.BLUE);
+        font.drawString("This is a test string!", 400, 100, GLColor.BLUE);
     }
 
     @Override

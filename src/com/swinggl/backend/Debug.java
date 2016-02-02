@@ -24,8 +24,8 @@ package com.swinggl.backend;
  */
 
 import com.swinggl.elements.GLFrame;
+import com.swinggl.util.GLColor;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class Debug {
     private static ArrayList<String> variables = new ArrayList<String>();
     private static TrueTypeFont engineFont;
     private static TrueTypeFont engineFontBold;
-    private static Color fontColor = new Color(187, 36, 190);
+    private static GLColor fontColor = GLColor.MAGENTA;
 
     public static double renderDelta = 0.0;
     public static double updateDelta = 0.0;

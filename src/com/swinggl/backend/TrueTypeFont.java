@@ -1,12 +1,12 @@
 package com.swinggl.backend;
 
+import com.swinggl.util.GLColor;
 import com.swinggl.util.IOUtil;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTruetype;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -131,9 +131,9 @@ public class TrueTypeFont {
      * @param text  - The text
      * @param x     - The x coordinate
      * @param y     - The y coordinate
-     * @param color - The color of the text
+     * @param color - The color of the text (GLColor)
      */
-    public void drawString(String text, float x, float y, Color color) {
+    public void drawString(String text, float x, float y, GLColor color) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -26,11 +26,12 @@ package com.swinggl.elements;
 import com.swinggl.backend.Debug;
 import com.swinggl.backend.Keyboard;
 import com.swinggl.backend.Mouse;
+import com.swinggl.util.GLColor;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLUtil;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
@@ -59,7 +60,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public class GLFrame {
 
-    public static final String VERSION = "1.0.0a";
+    static {
+        //System.setProperty("java.awt.headless", "true");
+        System.setProperty("org.lwjgl.util.Debug", "true");
+    }
+
+    public static final String VERSION = "1.0.1a";
 
     public static final int WINDOW_CENTERED = 0;
     public static final int WINDOW_TOP_LEFT = 1;
@@ -91,7 +97,7 @@ public class GLFrame {
 
     // Window Attributes
     private String title = "SwingGL - GLFrame";
-    private Color backgroundColor = Color.WHITE;
+    private GLColor backgroundColor = GLColor.WHITE;
     private int windowWidth = 600;
     private int windowHeight = 400;
     private int windowX = 0;
@@ -140,8 +146,6 @@ public class GLFrame {
      * @param secondWindowHandle - The other window handle that this GLFrame will be linked to.
      */
     public GLFrame(boolean fullscreen, long secondWindowHandle) {
-        System.setProperty("java.awt.headless", "true");
-        System.setProperty("org.lwjgl.util.Debug", "true");
         Debug.enabled = false;
         Thread.currentThread().setName("SwingGL | render");
         this.fullscreen = fullscreen;
@@ -213,13 +217,17 @@ public class GLFrame {
         glfwSwapInterval(1);
 
         GL.createCapabilities();
+        GLUtil.setupDebugMessageCallback();
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         GL11.glOrtho(0, windowWidth, windowHeight, 0, 1, -1);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+        /*
         GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
                 backgroundColor.getAlpha() / 255f);
+                */
+        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 
         Debug.initialize();
 
@@ -270,7 +278,7 @@ public class GLFrame {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         long startTime = 0L;
-        if(Debug.enabled)
+        if (Debug.enabled)
             startTime = System.nanoTime();
 
         if (currentGameState != null) {
@@ -280,7 +288,7 @@ public class GLFrame {
                 currentGameState.init(this);
         }
 
-        if(Debug.enabled)
+        if (Debug.enabled)
             Debug.renderTime = System.nanoTime() - startTime;
 
         Debug.render(this);
@@ -449,7 +457,7 @@ public class GLFrame {
      *
      * @return - Gives the background color
      */
-    public Color getBackgroundColor() {
+    public GLColor getBackgroundColor() {
         return backgroundColor;
     }
 
@@ -522,8 +530,8 @@ public class GLFrame {
      *
      * @return - The window position
      */
-    public Point getPosition() {
-        return new Point(windowX, windowY);
+    public float[] getPosition() {
+        return new float[]{windowX, windowY};
     }
 
     /**
@@ -531,8 +539,8 @@ public class GLFrame {
      *
      * @return - The size of the window
      */
-    public Dimension getSize() {
-        return new Dimension(windowWidth, windowHeight);
+    public float[] getSize() {
+        return new float[]{windowWidth, windowHeight};
     }
 
     /**
@@ -549,7 +557,7 @@ public class GLFrame {
      *
      * @param color - The background color
      */
-    public void setBackgroundColor(Color color) {
+    public void setBackgroundColor(GLColor color) {
         backgroundColor = color;
         if (window != 0L)
             GL11.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);

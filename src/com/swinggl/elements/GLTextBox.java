@@ -4,10 +4,10 @@ import com.swinggl.backend.Button;
 import com.swinggl.backend.Keyboard;
 import com.swinggl.backend.Mouse;
 import com.swinggl.backend.TrueTypeFont;
+import com.swinggl.util.GLColor;
 import com.swinggl.util.RenderUtil;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -62,7 +62,7 @@ public class GLTextBox extends Button {
     public void render() {
         RenderUtil.drawImmediateTexture(x, y, w, h, texCoords[state]);
         GL11.glEnd();
-        font.drawString(text, x, y, Color.BLACK);
+        font.drawString(text, x, y, GLColor.BLACK);
         GL11.glBegin(GL11.GL_QUADS);
     }
 }

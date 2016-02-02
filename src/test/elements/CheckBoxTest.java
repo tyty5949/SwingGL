@@ -4,10 +4,10 @@ import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLCheckBox;
 import com.swinggl.elements.GLFrame;
 import com.swinggl.elements.GLPanel;
+import com.swinggl.util.GLColor;
 import com.swinggl.util.SpriteSheet;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,7 +18,7 @@ public class CheckBoxTest extends GLPanel {
     public static void main(String[] args) {
         GLFrame glFrame = new GLFrame(false);
         glFrame.setSize(1280, 720);
-        glFrame.setBackgroundColor(Color.GRAY);
+        glFrame.setBackgroundColor(GLColor.GRAY);
         glFrame.setTitle("This is a test title");
         glFrame.setPosition(GLFrame.WINDOW_CENTERED);
         glFrame.setPanel(new CheckBoxTest());
