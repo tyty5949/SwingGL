@@ -38,6 +38,7 @@ public class Mouse {
     private static boolean[] buttons = new boolean[8];
     private static int scrollDX;
     private static int scrollDY;
+    private static float scale = 1f;
 
     public static float getX() {
         return x;
@@ -63,12 +64,16 @@ public class Mouse {
         return temp;
     }
 
+    public static void setScale(float scale) {
+        Mouse.scale = scale;
+    }
+
     public static class CursorPos extends GLFWCursorPosCallback {
 
         @Override
         public void invoke(long window, double xpos, double ypos) {
-            x = (float) xpos;
-            y = (float) ypos;
+            x = (float) xpos * scale;
+            y = (float) ypos * scale;
         }
     }
 
