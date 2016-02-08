@@ -45,7 +45,7 @@ public class TrueTypeFont {
             startTime = System.nanoTime();
 
         textureID = glGenTextures();
-        cdata = STBTTBakedChar.malloc(96);
+        cdata = STBTTBakedChar.mallocBuffer(96);
 
         try {
             ByteBuffer ttf = IOUtil.ioResourceToByteBuffer(filePath, 160 * 1024);
@@ -141,7 +141,7 @@ public class TrueTypeFont {
         glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
 
         glPushMatrix();
-        glTranslatef(x, y + (fontHeight * .5f), 0f);
+        glTranslatef(x, y + fontHeight, 0f);
 
         xbuf.put(0, 0.0f);
         ybuf.put(0, 0.0f);

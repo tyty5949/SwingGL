@@ -1,5 +1,7 @@
 package test.elements;
 
+import com.swinggl.backend.GLAction;
+import com.swinggl.backend.GLActionListener;
 import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLButton;
 import com.swinggl.elements.GLFrame;
@@ -35,10 +37,10 @@ public class ButtonTest extends GLPanel {
     @Override
     public void init(final GLFrame frame) {
         tex = new Texture("res/test/backend/button.png");
-        button = new GLButton(300, 100, 256, 256, new ActionListener() {
+        button = new GLButton(300, 100, 256, 256, new GLActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("pressed");
+            public void actionPerformed(GLAction e) {
+                System.out.println(e.action());
             }
         }, SpriteSheet.getGLButtonCoords(0f, 0f, 256f, 256f, tex));
 

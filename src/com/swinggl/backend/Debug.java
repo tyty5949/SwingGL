@@ -25,6 +25,7 @@ package com.swinggl.backend;
 
 import com.swinggl.elements.GLFrame;
 import com.swinggl.util.GLColor;
+import org.lwjgl.opengl.GL11;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -43,7 +44,7 @@ public class Debug {
     private static ArrayList<String> variables = new ArrayList<String>();
     private static TrueTypeFont engineFont;
     private static TrueTypeFont engineFontBold;
-    private static GLColor fontColor = GLColor.MAGENTA;
+    private static GLColor fontColor = new GLColor(GLColor.MAGENTA.getRed(), GLColor.MAGENTA.getGreen(), GLColor.MAGENTA.getBlue(), 200f);
 
     public static double renderDelta = 0.0;
     public static double updateDelta = 0.0;
@@ -53,7 +54,7 @@ public class Debug {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_GREEN = "\u001B[1;32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_PURPLE = "\u001B[35m";
@@ -61,8 +62,8 @@ public class Debug {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     public static void initialize() {
-        engineFont = new TrueTypeFont("res/fonts/swinggl.ttf", 24);
-        engineFontBold = new TrueTypeFont("res/fonts/swinggl_bold.ttf", 24);
+        engineFont = new TrueTypeFont("res/swinggl/fonts/swinggl.ttf", 24);
+        engineFontBold = new TrueTypeFont("res/swinggl/fonts/swinggl_bold.ttf", 24);
     }
 
     private static int timer = 0;
@@ -73,14 +74,19 @@ public class Debug {
     private static long renderTimeSum = 0L;
     private static double avgRenderTime = 0.0;
 
+    private static float yOffset = 0f;
+
     public static void render(GLFrame frame) {
-        if(enabled) {
+        if (enabled) {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0f, 10f, 0f);
             engineFontBold.drawString("SwingGL v" + GLFrame.VERSION, 2, 18, fontColor);
             engineFontBold.drawString("FPS:", 2, 38, fontColor);
             engineFontBold.drawString("UPS:", 2, 58, fontColor);
             engineFontBold.drawString("Current GLPanel:", 2, 78, fontColor);
             engineFont.drawString(frame.getPanel().toString(), 180, 78, fontColor);
             engineFontBold.drawString("Render time:", 2, 98, fontColor);
+            engineFontBold.drawString("Theory Max FPS: ", 2, 138, fontColor);
 
             renderSum += renderDelta;
             updateSum += updateDelta;
@@ -99,12 +105,18 @@ public class Debug {
             engineFont.drawString(noNotation.format(1.0 / avgUpdateDelta), 50, 58, fontColor);
             engineFont.drawString(noNotation.format(avgRenderTime) + "ns", 140, 98, fontColor);
             engineFont.drawString(noNotationLong.format(avgRenderTime / 1000000000.0) + "s", 140, 118, fontColor);
+            engineFont.drawString(noNotation.format(1.0 / (avgRenderTime / 1000000000.0)) + " fps", 178, 138, fontColor);
+            GL11.glPopMatrix();
         }
 
     }
 
     public void debugVariable(String variablePath) {
 
+    }
+
+    public static void setOffset(float xOffset, float yOffset) {
+        Debug.yOffset = yOffset;
     }
 
     public static void println(String text, String color) {

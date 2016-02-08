@@ -1,24 +1,25 @@
 package com.swinggl.elements;
 
 import com.swinggl.backend.Button;
+import com.swinggl.backend.GLAction;
+import com.swinggl.backend.GLActionListener;
 import com.swinggl.backend.Mouse;
 import com.swinggl.util.RenderUtil;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created on 12/17/2015.
  */
 public class GLCheckBox extends Button {
 
+    public static int PRESSED = 0;
+
     private boolean mouseCooldown;
     private float[][] texCoords;
-    private ActionListener listener;
+    private GLActionListener listener;
     private boolean checked;
     private int state;
 
-    public GLCheckBox(float x, float y, float w, float h, boolean checked, ActionListener listener, float[][] texCoords) {
+    public GLCheckBox(float x, float y, float w, float h, boolean checked, GLActionListener listener, float[][] texCoords) {
         super(x, y, w, h);
         this.texCoords = texCoords;
         this.checked = checked;
@@ -31,7 +32,7 @@ public class GLCheckBox extends Button {
             state = 1;
             if (Mouse.isButtonDown(0)) {
                 state = 2;
-                listener.actionPerformed(new ActionEvent(this, 0, "pressed"));
+                listener.actionPerformed(new GLAction(PRESSED));
                 if (!mouseCooldown)
                     checked = !checked;
             }

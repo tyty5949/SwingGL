@@ -65,7 +65,7 @@ public class GLFrame {
         System.setProperty("org.lwjgl.util.Debug", "true");
     }
 
-    public static final String VERSION = "1.0.1a";
+    public static final String VERSION = "1.0.2a";
 
     public static final int WINDOW_CENTERED = 0;
     public static final int WINDOW_TOP_LEFT = 1;
@@ -223,11 +223,8 @@ public class GLFrame {
         GL11.glOrtho(0, windowWidth, windowHeight, 0, 1, -1);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-        /*
         GL11.glClearColor(backgroundColor.getRed() / 255f, backgroundColor.getGreen() / 255f, backgroundColor.getBlue() / 255f,
                 backgroundColor.getAlpha() / 255f);
-                */
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 
         Debug.initialize();
 

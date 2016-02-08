@@ -1,5 +1,7 @@
 package test.elements;
 
+import com.swinggl.backend.GLAction;
+import com.swinggl.backend.GLActionListener;
 import com.swinggl.backend.Texture;
 import com.swinggl.backend.TrueTypeFont;
 import com.swinggl.elements.GLFrame;
@@ -7,9 +9,6 @@ import com.swinggl.elements.GLPanel;
 import com.swinggl.elements.GLTextBox;
 import com.swinggl.util.SpriteSheet;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created on 1/6/2016.
@@ -36,10 +35,10 @@ public class TextBoxTest extends GLPanel {
     public void init(GLFrame frame) {
         tex = new Texture("res/test/backend/textbox.png");
         font = new TrueTypeFont("res/fonts/swinggl.ttf", 64);
-        glTextBox = new GLTextBox(300, 100, 200, 50, "Test", font, new ActionListener() {
+        glTextBox = new GLTextBox(300, 100, 200, 50, "Test", font, new GLActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Pressed");
+            public void actionPerformed(GLAction e) {
+                System.out.println(e.action());
             }
         }, SpriteSheet.getGLTextBoxCoords(0, 0, 400, 100, tex));
 

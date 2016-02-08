@@ -1,20 +1,16 @@
 package com.swinggl.elements;
 
-import com.swinggl.backend.Button;
-import com.swinggl.backend.Keyboard;
-import com.swinggl.backend.Mouse;
-import com.swinggl.backend.TrueTypeFont;
+import com.swinggl.backend.*;
 import com.swinggl.util.GLColor;
 import com.swinggl.util.RenderUtil;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Created on 1/6/2016.
  */
 public class GLTextBox extends Button {
+
+    public static final int PRESSED = 0;
 
     private float x;
     private float y;
@@ -22,13 +18,13 @@ public class GLTextBox extends Button {
     private float h;
     private String text;
     private TrueTypeFont font;
-    private ActionListener listener;
+    private GLActionListener listener;
     private float[][] texCoords;
     private int state = 0;
     private boolean mouseCooldown = false;
     private int lastKey;
 
-    public GLTextBox(float x, float y, float w, float h, String startText, TrueTypeFont font, ActionListener listener, float[][] texCoords) {
+    public GLTextBox(float x, float y, float w, float h, String startText, TrueTypeFont font, GLActionListener listener, float[][] texCoords) {
         super(x, y, w, h);
         this.x = x;
         this.y = y;
@@ -44,7 +40,7 @@ public class GLTextBox extends Button {
         if (Mouse.isButtonDown(0) && !mouseCooldown) {
             if (contains(Mouse.getX(), Mouse.getY())) {
                 state = 1;
-                listener.actionPerformed(new ActionEvent(this, 0, "pressed"));
+                listener.actionPerformed(new GLAction(PRESSED));
             } else
                 state = 0;
         }

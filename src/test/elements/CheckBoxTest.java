@@ -1,5 +1,7 @@
 package test.elements;
 
+import com.swinggl.backend.GLAction;
+import com.swinggl.backend.GLActionListener;
 import com.swinggl.backend.Texture;
 import com.swinggl.elements.GLCheckBox;
 import com.swinggl.elements.GLFrame;
@@ -34,10 +36,10 @@ public class CheckBoxTest extends GLPanel {
     @Override
     public void init(final GLFrame frame) {
         tex = new Texture("res/test/backend/checkbox.png");
-        checkBox = new GLCheckBox(100f, 100f, 32f, 32f, false, new ActionListener() {
+        checkBox = new GLCheckBox(100f, 100f, 32f, 32f, false, new GLActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getActionCommand());
+            public void actionPerformed(GLAction e) {
+                System.out.println(e.action());
             }
         }, SpriteSheet.getGLCheckBoxCoords(0f, 0f, 32f, 32f, tex));
 

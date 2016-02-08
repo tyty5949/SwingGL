@@ -39,6 +39,8 @@ public class Mouse {
     private static int scrollDX;
     private static int scrollDY;
     private static float scale = 1f;
+    private static float xOffset = 0f;
+    private static float yOffset = 0f;
 
     public static float getX() {
         return x;
@@ -64,6 +66,11 @@ public class Mouse {
         return temp;
     }
 
+    public static void setOffset(float xOffset, float yOffset) {
+        Mouse.xOffset = xOffset;
+        Mouse.yOffset = yOffset;
+    }
+
     public static void setScale(float scale) {
         Mouse.scale = scale;
     }
@@ -72,8 +79,8 @@ public class Mouse {
 
         @Override
         public void invoke(long window, double xpos, double ypos) {
-            x = (float) xpos * scale;
-            y = (float) ypos * scale;
+            x = ((float) xpos + xOffset) * scale;
+            y = ((float) ypos + yOffset) * scale;
         }
     }
 
